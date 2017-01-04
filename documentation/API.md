@@ -1,10 +1,16 @@
 # media-manager API
 
+Quickly jump to:
+
+* [medias](#medias)
+* [buckets](#buckets)
+* [misc](#misc)
+
 ## Medias
 
 A media is a media instance (a file + its datas) stored in the database.
 
-##### GET `/api/v1/medias/:id`
+##### &rarr; GET `/api/v1/medias/:id`
 Sends the raw media datas. `content-type` depends on media mime type.
 ###### Response
 ```
@@ -16,8 +22,10 @@ Response headers :
 Response body : /* raw media datas */
 ```
 
-##### GET `/api/v1/medias/count`
-Sends the number of medias in database. Request can accept `text/plain` or `application/json` as `content-type` headers.
+##### &rarr; GET `/api/v1/medias/count`
+Sends the number of medias in database.
+
+Request can accept `text/plain` or `application/json` as `content-type` headers.
 ###### Response
 ```
 Response code : 200
@@ -28,17 +36,17 @@ Response headers :
 Response body : 60
 ```
 
-##### GET `/api/v1/medias/first`
+##### &rarr; GET `/api/v1/medias/first`
 Sends the very first media in database.
 ###### Response
 See [`GET api/v1/medias/:id`](#get-apiv1mediasid).
 
-##### GET `/api/v1/medias/last`
+##### &rarr; GET `/api/v1/medias/last`
 Sends the very last media in database.
 ###### Response
 See [`GET api/v1/medias/:id`](#get-apiv1mediasid).
 
-##### GET `/api/v1/medias/:id/datas`
+##### &rarr; GET `/api/v1/medias/:id/datas`
 Sends the JSON datas related to the media.
 ###### Response
 ```
@@ -62,7 +70,7 @@ Response body :
 }
 ```
 
-##### GET `/api/v1/medias/:id/datas/:field`
+##### &rarr; GET `/api/v1/medias/:id/datas/:field`
 Sends the specific field for the media.
 ###### Response
 *Example: `GET /api/v1/medias/:id/datas/type`*
@@ -78,7 +86,7 @@ Response body :
 }
 ```
 
-##### POST `/api/v1/medias`
+##### &rarr; POST `/api/v1/medias`
 Uploads a new media.
 
 You have 4 ways to send the media:
@@ -114,18 +122,18 @@ Response body :
 }
 ```
 
-##### PUT `/api/v1/medias/:id`
+##### &rarr; PUT `/api/v1/medias/:id`
 Update a media property, or the media itself.
 
 Works the same as [`POST api/v1/medias/`](#post-apiv1mediasid), except:
 * Response will have code `200`.
 
-##### PUT `/api/v1/medias/:id/metas`
+##### &rarr; PUT `/api/v1/medias/:id/metas`
 Shortcut for `PUT api/v1/medias/:id -d '{ "metas": /* ... */}'`.
 
 See [`PUT api/v1/medias/:id`](#put-apiv1mediasid).
 
-##### GET `/api/v1/medias`
+##### &rarr; GET `/api/v1/medias`
 Sends a list of all medias **properties** in database. Default pagination range is 50.
 ###### Response
 ```
@@ -140,7 +148,7 @@ Response body :
 [/* some huge list of medias properties */]
 ```
 
-##### POST `/api/v1/medias/:id/generateQR`
+##### &rarr; POST `/api/v1/medias/:id/generateQR`
 Action that attaches a QR code to a media. Media datas will then have a `QR` field.
 
 *For now, it hasn't been determined weither we attached a URI/path to the QR code image, or weither we attach the base64/raw data.*
@@ -172,7 +180,7 @@ A bucket is a collection of medias. It has the following scheme:
 }
 ```
 
-##### GET `api/v1/buckets/:id`
+##### &rarr; GET `api/v1/buckets/:id`
 Sends the bucket JSON object.
 ###### Response
 ```
@@ -185,8 +193,10 @@ Response body :
 [JSON Object]
 ```
 
-##### GET `api/v1/buckets/count`
-Sends the number of buckets in database. Request can accept `text/plain` or `application/json` as `content-type` headers.
+##### &rarr; GET `api/v1/buckets/count`
+Sends the number of buckets in database.
+
+Request can accept `text/plain` or `application/json` as `content-type` headers.
 ###### Response
 ```
 Response code : 200
@@ -198,17 +208,17 @@ Response body :
 5
 ```
 
-##### GET `api/v1/buckets/first`
+##### &rarr; GET `api/v1/buckets/first`
 Sends the very first bucket in database.
 ###### Response
 See [`GET api/v1/buckets/:id`](#get-apiv1bucketsid).
 
-##### GET `api/v1/buckets/last`
+##### &rarr; GET `api/v1/buckets/last`
 Sends the very last bucket in database.
 ###### Response
 See [`GET api/v1/buckets/:id`](#get-apiv1mediasid).
 
-##### POST `api/v1/buckets`
+##### &rarr; POST `api/v1/buckets`
 Creates a new bucket instance in database.
 
 Server responds with new bucket object if request succeeded.
@@ -228,13 +238,13 @@ Response body :
 [JSON Object]
 ```
 
-##### PUT `api/v1/buckets`
+##### &rarr; PUT `api/v1/buckets`
 Update a bucket property (i.e its name).
 
 Works the same as [`POST api/v1/buckets/`](#post-apiv1bucketsid), except:
 * Response will have code `200`.
 
-##### GET `api/v1/buckets`
+##### &rarr; GET `api/v1/buckets`
 Sends a list of all buckets in database. Default pagination range is 10.
 ###### Response
 ```
@@ -251,8 +261,10 @@ Response body :
 
 ## Misc.
 
-##### GET `api/v1/ping`
-Convenience method to check if API is up or not. Request can accept `text/plain` or `application/json` as `content-type` headers.
+##### &rarr; GET `api/v1/ping`
+Convenience method to check if API is up or not.
+
+Request can accept `text/plain` or `application/json` as `content-type` headers.
 ###### Response
 ```
 Response code : 200
