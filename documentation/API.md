@@ -134,18 +134,53 @@ Shortcut for `PUT api/v1/medias/:id -d '{ "metas": /* ... */}'`.
 See [`PUT api/v1/medias/:id`](#put-apiv1mediasid).
 
 ##### &rarr; GET `/api/v1/medias`
-Sends a list of all medias **properties** in database. Default pagination range is 50.
+Sends a list of all medias **datas** in database.
 ###### Response
 ```
 Response code : 206
 
 Response headers :
 "content-type": "application/json;"
-"content-range": "0-49/249",
-"accept-ranges": "medias 50",
+"content-range": "0-49/249"
 
 Response body :
-[/* some huge list of medias properties */]
+{
+  "datas": [/* some huge list of medias datas */],
+  "data_type": "medias",
+  "first-cursor": "abcd1234",
+  "last-cursor": "efgh5678",
+  "count": 60
+}
+```
+###### Pagination
+You can handle pagination with the `limit` query param. Default is `50`. You'd use the `cursor` query param to determine from which media `id` you want to start querying. If a response has more than `limit` entities, these endpoints will return the first `limit` entities and a `next-cursor` key in the response JSON.
+
+`GET http://media-manager.url/api/v1/medias?limit=50`
+
+```
+{
+  "datas": [/* the first 50 medias datas */],
+  "data_type": "medias",
+  "first-cursor": "abcd1234",
+  "next-cursor": "efgh5678",
+  "count": 200
+}
+```
+
+To get the next series of medias, add `cursor` to your query params:
+
+_**protip:** You can use negative `limit` query param to perfom reverse looking requests._
+
+`GET http://media-manager.url/api/v1/medias?limit=50&cursor=efgh5678`
+
+```
+{
+  "datas": [/* the 50 medias datas starting from id "efgh5678" */],
+  "data_type": "medias",
+  "first-cursor": "efgh5678",
+  "next-cursor": "ijkl91011",
+  "count": 200
+}
 ```
 
 ##### &rarr; POST `/api/v1/medias/:id/generateQR`
@@ -245,18 +280,53 @@ Works the same as [`POST api/v1/buckets/`](#post-apiv1bucketsid), except:
 * Response will have code `200`.
 
 ##### &rarr; GET `api/v1/buckets`
-Sends a list of all buckets in database. Default pagination range is 10.
+Sends a list of all buckets in database.
 ###### Response
 ```
 Response code : 206
 
 Response headers :
 "content-type": "application/json;"
-"content-range": "0-9/59",
-"accept-ranges": "buckets 10",
+"content-range": "0-9/59"
 
 Response body :
-[/* some list of buckets */]
+{
+  "datas": [/* some huge list of buckets */],
+  "data_type": "buckets",
+  "first-cursor": "abcd1234",
+  "last-cursor": "efgh5678",
+  "count": 60
+}
+```
+###### Pagination
+You can handle pagination with the `limit` query param. Default is `10`. You'd use the `cursor` query param to determine from which bucket `id` you want to start querying. If a response has more than `limit` entities, these endpoints will return the first `limit` entities and a `next-cursor` key in the response JSON.
+
+`GET http://media-manager.url/api/v1/buckets?limit=10`
+
+```
+{
+  "datas": [/* the first 10 buckets */],
+  "data_type": "buckets",
+  "first-cursor": "abcd1234",
+  "next-cursor": "efgh5678",
+  "count": 25
+}
+```
+
+To get the next series of buckets, add `cursor` to your query params:
+
+_**protip:** You can use negative `limit` query param to perfom reverse looking requests._
+
+`GET http://media-manager.url/api/v1/buckets?limit=10&cursor=efgh5678`
+
+```
+{
+  "datas": [/* the 10 buckets starting from id "efgh5678" */],
+  "data_type": "buckets",
+  "first-cursor": "efgh5678",
+  "next-cursor": "ijkl91011",
+  "count": 25
+}
 ```
 
 ## Misc.
