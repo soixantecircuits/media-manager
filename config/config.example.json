@@ -1,0 +1,5 @@
+{
+  "uploads": "/tmp/uploads",
+  "defaultState": "public",
+  "states": ["public", "private", "draft"]
+}
