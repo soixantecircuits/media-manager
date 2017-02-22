@@ -79,7 +79,9 @@ Response body :
 Sends image or video media with corresponding `id`.
 
 ##### GET `/api/v1/medias/:id/details`
-Sends available informations on media with corresponding `id`.
+Sends available informations on media with corresponding `id`.  
+You can retrieve the next X medias by adding the `next` query parameter or the X previous medias by adding the `prev` query parameter.  
+Example: `GET /api/v1/medias/:id/details?next=10`
 
 ###### Response
 ```
