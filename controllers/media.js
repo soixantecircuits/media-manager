@@ -18,10 +18,6 @@ router.delete('/all', function (req, res) {
 })
 
 // ----- GET ----- //
-function getURI (request) {
-  return request.protocol + '://' + request.get('host') + request.originalUrl
-}
-
 function getMediaCount (stateFilter) {
   return new Promise((resolve, reject) => {
     var criteria = (stateFilter === undefined) ? {} : {state: stateFilter}
@@ -61,15 +57,6 @@ router.get('/:id', function (req, res) {
       var data = fs.readFileSync(path.join(media.path, media.filename))
       res.contentType(media.type)
       res.send(data)
-    }
-  })
-})
-
-router.get('/:id/details', function (req, res) {
-  Media.findById(req.params.id, (err, media) => {
-    if (err) { res.send(err) } else {
-      media.URI = getURI(req)
-      res.json(media)
     }
   })
 })

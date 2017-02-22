@@ -34,4 +34,28 @@ router.get('/', function (req, res) {
   })
 })
 
+function getURI (request) {
+  return request.protocol + '://' + request.get('host') + request.originalUrl
+}
+
+router.get('/:id/details', function (req, res) {
+  var next = req.query.next
+  var prev = req.query.prev
+  var curId = req.params.id
+  var query
+
+  if (next !== undefined) {
+    query = Media.find({_id: {$gte: curId}}).sort({_id: 1}).limit(Number(next) + 1)
+  } else if (prev !== undefined) {
+    query = Media.find({_id: {$lte: curId}}).sort({_id: -1}).limit(Number(prev) + 1)
+  } else {
+    query = Media.findById(curId)
+  }
+  query.exec((err, media) => {
+    if (err) { res.send(err) } else {
+      res.json(media)
+    }
+  })
+})
+
 module.exports = router
