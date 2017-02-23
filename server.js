@@ -12,7 +12,7 @@ const paginationRouter = require('./controllers/pagination')
 const app = express()
 const port = process.env.PORT || 8080
 
-mongoose.connect('mongodb://localhost/test')
+mongoose.connect('mongodb://localhost/media-manager')
 mongoose.Promise = global.Promise
 
 const db = mongoose.connection
