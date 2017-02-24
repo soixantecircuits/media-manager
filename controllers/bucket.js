@@ -15,33 +15,47 @@ function slugify (text) {
     .replace(/-+$/, '')
 }
 
-function updateBucket (bucket) {
-  return new Promise((resolve, reject) => {
-    Media.find({'bucketId': bucket._id})
-    .exec((err, medias) => {
-      if (err) { reject(err) } else {
-        bucket.medias = medias
-        bucket.save(err => {
-          if (err) { reject(err) } else { Utils.spacebroClient.emit('new-bucket', bucket) }
+Utils.spacebroClient.on('media-updated', function (data) {
+  if (data.newBucketId) {
+    var errorMsg = 'Error while updating bucket ' + data.newBucketId + ':\n'
+    Bucket.findById(data.newBucketId, (err, bucket) => {
+      if (err) { return console.log(errorMsg, err) } else {
+        Media.findById(data.mediaId, (err, media) => {
+          if (err) { return console.log(errorMsg, err) } else {
+            bucket.medias.push(media)
+            console.log(bucket.medias)
+            bucket.save(err => {
+              if (err) { return console.log(errorMsg, err) } else {
+                console.log('Media', data.mediaId, 'has been added to bucket', data.newBucketId)
+              }
+            })
+          }
         })
-        resolve(bucket)
       }
     })
-  })
-}
+  }
+})
 
 // ----- POST ----- //
 router.post('/', function (req, res) {
   var name = req.body.name
-
-  if (name === undefined) { res.send('Error: name field undefined') }
-  var bucket = new Bucket()
-  bucket.createdAt = new Date().toISOString()
-  bucket.slug = slugify(name)
-  bucket.name = name
-  updateBucket(bucket)
-  .then(result => res.send(result))
-  .catch(error => res.send(error))
+  if (name === undefined) {
+    res.send('Error: name field undefined')
+  } else {
+    var bucket = new Bucket()
+    bucket.createdAt = new Date().toISOString()
+    bucket.slug = slugify(name)
+    bucket.name = name
+    bucket.medias = []
+    bucket.save(err => {
+      if (err) {
+        res.send(err)
+      } else {
+        Utils.spacebroClient.emit('new-bucket', bucket)
+        res.send(bucket)
+      }
+    })
+  }
 })
 
 // ----- GET ----- //
@@ -55,22 +69,6 @@ router.get('/', function (req, res) {
         firstCursor: buckets[0] ? buckets[0]._id : undefined,
         lastCursor: buckets[len - 1] ? buckets[len - 1]._id : undefined,
         count: len
-      })
-    }
-  })
-})
-
-router.get('/update', function (req, res) {
-  var updated = 0
-  Bucket.find().exec((err, buckets) => {
-    if (err) { res.send(err) } else {
-      buckets.forEach(bucket => {
-        updateBucket(bucket)
-        .then(result => {
-          updated++
-          if (updated === buckets.length) { res.send('Updated ' + updated + ' bucket(s)') }
-        })
-        .catch(error => res.send(error))
       })
     }
   })

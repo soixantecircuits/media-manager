@@ -116,17 +116,20 @@ router.post('/', function (req, res) {
 router.put('/:id', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) { res.send(err) } else {
-      media.state = req.body.state || media.state
-      media.bucketId = req.body.bucketId || media.bucketId
+      var spacebroData = {mediaId: media._id}
+      if (req.body.state && req.body.state !== media.state) {
+        media.state = req.body.state
+        spacebroData['newState'] = media.state
+      }
+      if (req.body.bucketId && req.body.bucketId !== media.bucketId) {
+        media.bucketId = req.body.bucketId
+        spacebroData['newBucketId'] = media.bucketId
+      }
       if (req.body.state || req.body.bucketId) {
         media.updatedAt = new Date().toISOString()
         media.save(err => {
-          if (err) { res.send(err) } else {
-            console.log('Updated media', media._id)
-            console.log('state :', media.state)
-            console.log('bucketId :', media.bucketId)
-          }
-          Utils.spacebroClient.emit('media-updated', {mediaId: media._id})
+          if (err) { res.send(err) } else { console.log('Updated media', media._id) }
+          Utils.spacebroClient.emit('media-updated', spacebroData)
         })
       }
       res.json(media)
