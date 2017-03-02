@@ -140,10 +140,12 @@ router.put('/:id', function (req, res) {
 // ----- DELETE ----- //
 router.delete('/:id', function (req, res) {
   var id = req.params.id
-  Media.remove({_id: id},
-    (err, media) => {
-      if (err) { res.send(err) } else { res.send('Successfully deleted ' + id) }
-    })
+  Media.findByIdAndRemove(id, function (err, media) {
+    if (err) { res.send(err) } else {
+      Utils.spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
+      res.send('Successfully deleted ' + id)
+    }
+  })
 })
 
 module.exports = router
