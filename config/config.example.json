@@ -1,4 +1,8 @@
 {
+  "spacebro": {
+    "address": "localhost",
+    "port": 8888
+  },
   "uploads": "/tmp/uploads",
   "defaultState": "public",
   "states": ["public", "private", "draft"]

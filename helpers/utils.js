@@ -6,7 +6,7 @@ const config = require('../config/config')
 const path = require('path')
 const spacebroClient = require('spacebro-client')
 
-spacebroClient.connect('127.0.0.1', 8888, {
+spacebroClient.connect(config.spacebro.address, config.spacebro.port, {
   clientName: 'media-moderator',
   channelName: 'media-stream',
   verbose: false
@@ -36,7 +36,26 @@ function createMedia (options) {
   })
 }
 
+function checkIntegrity() {
+  Media.find().exec((err, medias) => {
+    if (err) { return console.log(err) } else {
+      medias.forEach(media => {
+        var mediaPath = path.join(media.path, media.filename)
+        if (mh.isFile(mediaPath) === false) {
+          Media.findByIdAndRemove(media._id, function (err, media) {
+            if (err) { return console.log(err) } else {
+              spacebroClient.emit('media-deleted', {mediaId: media._id, bucketId: media.bucketId})
+              console.log(media._id.toString(), 'has been deleted: file not found')
+            }
+          })
+        }
+      })
+    }
+  })
+}
+
 module.exports = {
   spacebroClient,
-  createMedia
+  createMedia,
+  checkIntegrity
 }

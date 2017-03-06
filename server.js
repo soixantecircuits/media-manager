@@ -41,4 +41,5 @@ app.listen(port, function () {
   Utils.spacebroClient.on('new-media', function (data) {
     Utils.createMedia({ file: data.path })
   })
+ Utils.checkIntegrity()
 })
