@@ -140,10 +140,24 @@ router.put('/:id', function (req, res) {
 // ----- DELETE ----- //
 router.delete('/:id', function (req, res) {
   var id = req.params.id
-  Media.findByIdAndRemove(id, function (err, media) {
-    if (err) { res.send(err) } else {
-      Utils.spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
-      res.send('Successfully deleted ' + id)
+  if (id) {
+    Utils.deleteMedia(id)
+    .catch(error => console.log(error))
+  }
+})
+
+// ----- SPACEBRO EVENTS COMING FROM CHOKIBRO ----- //
+Utils.spacebroClient.on('new-media', function (data) {
+  Utils.createMedia({ file: data.path })
+  .catch(error => console.log(error))
+})
+
+Utils.spacebroClient.on('unlink-media', function (data) {
+  var filename = path.basename(data.path)
+  Media.findOne({filename: filename}, (err, media) => {
+    if (err) { console.log(err) } else {
+      Utils.deleteMedia(media._id)
+      .catch(error => console.log(error))
     }
   })
 })

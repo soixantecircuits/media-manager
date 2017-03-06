@@ -36,6 +36,18 @@ function createMedia (options) {
   })
 }
 
+function deleteMedia(id) {
+  return new Promise((resolve, reject) => {
+    Media.findByIdAndRemove(id, function (err, media) {
+      if (err) { reject(err) } else {
+        spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
+        console.log('Successfully deleted ' + id)
+        resolve(media)
+      }
+    })
+  })
+}
+
 function checkIntegrity() {
   Media.find().exec((err, medias) => {
     if (err) { return console.log(err) } else {
@@ -57,5 +69,6 @@ function checkIntegrity() {
 module.exports = {
   spacebroClient,
   createMedia,
+  deleteMedia,
   checkIntegrity
 }

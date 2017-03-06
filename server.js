@@ -38,8 +38,5 @@ app.use('/api/v1/buckets', bucketRouter)
 
 app.listen(port, function () {
   console.log('Listening on port ' + port)
-  Utils.spacebroClient.on('new-media', function (data) {
-    Utils.createMedia({ file: data.path })
-  })
- Utils.checkIntegrity()
+  Utils.checkIntegrity()
 })
