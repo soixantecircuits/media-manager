@@ -53,7 +53,11 @@ router.get('/last', function (req, res) {
 
 router.get('/:id', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
-    if (err) { res.send(err) } else {
+    if (err) {
+      res.send(err)
+    } else if (media === null) {
+      res.send({error: 'Media not found'})
+    } else {
       if (typeof media.path !== 'string' || typeof media.filename !== 'string') {
         res.send({ error: 'Error while getting the path', details: 'Media path or filename is not a string.' })
       } else {
