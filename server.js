@@ -3,6 +3,7 @@
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const express = require('express')
+const config = require('./config/config')
 
 const Utils = require('./helpers/utils')
 const mediaRouter = require('./controllers/media')
@@ -28,6 +29,9 @@ var allowCrossDomain = function (req, res, next) {
   res.header('Access-Control-Allow-Headers', 'Content-Type')
   next()
 }
+
+app.use('/uploads', express.static(config.uploads))
+app.use('/chokibro', express.static(config.chokibroFolder))
 
 app.use(allowCrossDomain)
 app.use(bodyParser.json())

@@ -55,6 +55,21 @@ router.get('/:id', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       res.send(err)
+    } else {
+      if (media.path === config.uploads) {
+        res.redirect('/uploads/' + media.filename)
+      } else if (media.path === config.chokibroFolder) {
+        res.redirect('/chokibro/' + media.filename)
+      }
+    }
+  })
+})
+
+// This route is depreciated //
+router.get('/:id/old', function (req, res) {
+  Media.findById(req.params.id, (err, media) => {
+    if (err) {
+      res.send(err)
     } else if (media === null) {
       res.send({error: 'Media not found'})
     } else {
