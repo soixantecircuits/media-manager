@@ -89,6 +89,31 @@ router.get('/:id/old', function (req, res) {
   })
 })
 
+router.get('/thumbnail/:id', function (req, res) {
+  Media.findById(req.params.id, (err, media) => {
+    if (err) {
+      res.send(err)
+    } else if (media === null) {
+      res.send({error: 'Media not found'})
+    } else {
+      var details = media.mediaDetails
+      if (!details || !details.thumbnail || typeof details.thumbnail.path !== 'string') {
+        res.send({ error: 'Error while getting the path', details: 'Media path or filename is not a string.' })
+      } else {
+        var mediaPath = details.thumbnail.path
+        if (fs.existsSync(mediaPath)) {
+          var data = fs.readFileSync(mediaPath)
+          var mediaType = details.thumbnail.type ? details.thumbnail.type : 'image/jpg'
+          res.contentType(mediaType)
+          res.send(data)
+        } else {
+          res.send({ error: 'File does not exist' })
+        }
+      }
+    }
+  })
+})
+
 router.get('/:id/metas', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) { res.send(err) } else { res.json(media.meta) }
@@ -167,7 +192,11 @@ router.delete('/:id', function (req, res) {
 
 // ----- SPACEBRO EVENTS COMING FROM CHOKIBRO ----- //
 Utils.spacebroClient.on('new-media', function (data) {
-  Utils.createMedia({ file: data.path })
+  Utils.createMedia({
+    file: data.path,
+    meta: data.meta,
+    mediaDetails: data.mediaDetails
+  })
   .catch(error => console.log(error))
 })
 
