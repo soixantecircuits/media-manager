@@ -10,7 +10,8 @@ var Media = mongoose.model('media', {
   state: String,
   uploadedAt: Date,
   updatedAt: Date,
-  meta: Object
+  meta: Object,
+  mediaDetails: Object
 })
 
 module.exports = Media
