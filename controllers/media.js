@@ -9,14 +9,6 @@ const Media = require('../models/media')
 const config = require('../config/config')
 const Utils = require('../helpers/utils')
 
-// To be deleted //
-router.delete('/all', function (req, res) {
-  Media.remove({},
-    (err, media) => {
-      if (err) { res.send(err) } else { res.send('Successfully deleted medias') }
-    })
-})
-
 // ----- GET ----- //
 function getMediaCount (stateFilter) {
   return new Promise((resolve, reject) => {
@@ -56,31 +48,9 @@ router.get('/:id', function (req, res) {
     if (err) {
       res.send(err)
     } else if (media) {
-        res.redirect(path.join('/data', media.filename))
-      }
-  })
-})
-
-// This route is depreciated //
-router.get('/:id/old', function (req, res) {
-  Media.findById(req.params.id, (err, media) => {
-    if (err) {
-      res.send(err)
-    } else if (media === null) {
-      res.send({error: 'Media not found'})
+      res.redirect(path.join('/static', media.path, media.filename))
     } else {
-      if (typeof media.path !== 'string' || typeof media.filename !== 'string') {
-        res.send({ error: 'Error while getting the path', details: 'Media path or filename is not a string.' })
-      } else {
-        var mediaPath = path.join(media.path, media.filename)
-        if (fs.existsSync(mediaPath)) {
-          var data = fs.readFileSync(mediaPath)
-          res.contentType(media.type)
-          res.send(data)
-        } else {
-          res.send({ error: 'File does not exist' })
-        }
-      }
+      res.send({ error: 'Not found', id: req.params.id })
     }
   })
 })
@@ -126,14 +96,15 @@ router.get('/:id/details/:field', function (req, res) {
 router.post('/', function (req, res) {
   var media = req.body.media
   var filename = req.body.filename
-
   if (media === undefined) { res.send('Error: media field undefined') }
   if (filename === undefined) { res.send('Error: filename field undefined') }
-  var newFile = path.join(config.dataFolder, filename)
+
+  var relativePath = path.join(Utils.dateDir(), filename)
+  var absolutePath = path.join(config.dataFolder, relativePath)
   mh.toBase64(media).then(data => {
-    fs.writeFileSync(newFile, data, 'base64')
+    fs.writeFileSync(absolutePath, data, 'base64')
     Utils.createMedia({
-      file: newFile,
+      file: relativePath,
       meta: req.body.meta,
       bucketId: req.body.bucketId
     }).then(media => res.send(media))
@@ -178,16 +149,19 @@ router.delete('/:id', function (req, res) {
 
 // ----- SPACEBRO EVENTS COMING FROM CHOKIBRO ----- //
 Utils.spacebroClient.on('new-media', function (data) {
+  let filename = path.basename(data.path)
+  let relativePath = path.join(Utils.dateDir(), filename)
+  let absolutePath = path.join(config.dataFolder, relativePath)
+  fs.copySync(data.path, absolutePath)
   Utils.createMedia({
-    file: data.path,
+    file: relativePath,
     meta: data.meta,
     mediaDetails: data.mediaDetails
   })
-  .then(media => fs.copySync(data.path, path.join(media.path, media.filename)))
   .catch(error => console.log(error))
 })
 
-// This deletes a media when it is removed from chokibro folder, depreciated // 
+// This deletes a media when it is removed from chokibro folder, depreciated //
 /*
 Utils.spacebroClient.on('unlink-media', function (data) {
   var filename = path.basename(data.path)
