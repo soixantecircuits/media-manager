@@ -30,8 +30,7 @@ var allowCrossDomain = function (req, res, next) {
   next()
 }
 
-app.use('/uploads', express.static(config.uploads))
-app.use('/chokibro', express.static(config.chokibroFolder))
+app.use('/data', express.static(config.dataFolder))
 
 app.use(allowCrossDomain)
 app.use(bodyParser.json())

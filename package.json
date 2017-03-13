@@ -20,7 +20,7 @@
     "body-parser": "^1.15.2",
     "chokidar": "^1.6.1",
     "express": "^4.14.0",
-    "fs": "0.0.1-security",
+    "fs-extra": "^2.0.0",
     "media-helper": "^1.0.1",
     "mongoose": "^4.7.6",
     "path": "^0.12.7",

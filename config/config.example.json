@@ -3,8 +3,7 @@
     "address": "localhost",
     "port": 8888
   },
-  "chokibroFolder": "/tmp/data",
-  "uploads": "/tmp/uploads",
+  "dataFolder": "/path/to/dir",
   "defaultState": "public",
   "states": ["public", "private", "draft"]
 }

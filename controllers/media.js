@@ -1,6 +1,6 @@
 'use strict'
 
-const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 const mh = require('media-helper')
 const express = require('express')
@@ -55,13 +55,9 @@ router.get('/:id', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       res.send(err)
-    } else {
-      if (media.path === config.uploads) {
-        res.redirect('/uploads/' + media.filename)
-      } else if (media.path === config.chokibroFolder) {
-        res.redirect('/chokibro/' + media.filename)
+    } else if (media) {
+        res.redirect(path.join('/data', media.filename))
       }
-    }
   })
 })
 
@@ -133,27 +129,16 @@ router.post('/', function (req, res) {
 
   if (media === undefined) { res.send('Error: media field undefined') }
   if (filename === undefined) { res.send('Error: filename field undefined') }
-
-  var newFile = path.join(config.uploads, filename)
-
-  if (mh.isBase64(media) === true) {
-    fs.writeFileSync(newFile, media, 'base64')
+  var newFile = path.join(config.dataFolder, filename)
+  mh.toBase64(media).then(data => {
+    fs.writeFileSync(newFile, data, 'base64')
     Utils.createMedia({
       file: newFile,
       meta: req.body.meta,
       bucketId: req.body.bucketId
     }).then(media => res.send(media))
-  } else {
-    mh.toBase64(media).then(data => {
-      fs.writeFileSync(newFile, data, 'base64')
-      Utils.createMedia({
-        file: newFile,
-        meta: req.body.meta,
-        bucketId: req.body.bucketId
-      }).then(media => res.send(media))
-    })
-    .catch(error => res.send(error))
-  }
+  })
+  .catch(error => res.send(error))
 })
 
 // ----- PUT ----- //
@@ -172,7 +157,7 @@ router.put('/:id', function (req, res) {
       if (req.body.state || req.body.bucketId) {
         media.updatedAt = new Date().toISOString()
         media.save(err => {
-          if (err) { res.send(err) } else { console.log('Updated media', media._id) }
+          if (err) { res.send(err) } else { console.log('UPDATE -', media._id) }
           Utils.spacebroClient.emit('media-updated', spacebroData)
         })
       }
@@ -186,6 +171,7 @@ router.delete('/:id', function (req, res) {
   var id = req.params.id
   if (id) {
     Utils.deleteMedia(id)
+    .then(media => fs.unlinkSync(path.join(media.path, media.filename)))
     .catch(error => console.log(error))
   }
 })
@@ -197,17 +183,23 @@ Utils.spacebroClient.on('new-media', function (data) {
     meta: data.meta,
     mediaDetails: data.mediaDetails
   })
+  .then(media => fs.copySync(data.path, path.join(media.path, media.filename)))
   .catch(error => console.log(error))
 })
 
+// This deletes a media when it is removed from chokibro folder, depreciated // 
+/*
 Utils.spacebroClient.on('unlink-media', function (data) {
   var filename = path.basename(data.path)
   Media.findOne({filename: filename}, (err, media) => {
-    if (err) { console.log(err) } else {
+    if (err) { console.log(err) }
+    else if (media) {
       Utils.deleteMedia(media._id)
+      .then(media => fs.unlinkSync(path.join(media.path, media.filename)))
       .catch(error => console.log(error))
     }
   })
 })
+*/
 
 module.exports = router

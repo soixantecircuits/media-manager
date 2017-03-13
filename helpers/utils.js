@@ -7,7 +7,7 @@ const path = require('path')
 const spacebroClient = require('spacebro-client')
 
 spacebroClient.connect(config.spacebro.address, config.spacebro.port, {
-  clientName: 'media-moderator',
+  clientName: 'media-manager',
   channelName: 'media-stream',
   verbose: false
 })
@@ -21,13 +21,12 @@ function createMedia (options) {
       newMedia.uploadedAt = new Date().toISOString()
       newMedia.state = config.defaultState
       newMedia.type = type
-      newMedia.path = path.dirname(options.file)
+      newMedia.path = config.dataFolder
       newMedia.filename = path.basename(options.file)
-      newMedia.mediaDetails = options.mediaDetails	
-
+      newMedia.mediaDetails = options.mediaDetails
       newMedia.save(err => {
         if (err) { console.log(err) } else {
-          console.log('Added', newMedia._id, 'media')
+          console.log('ADD -', newMedia._id, path.join(newMedia.path, newMedia.filename))
           spacebroClient.emit('media-to-db', newMedia)
           resolve(newMedia)
         }
@@ -40,9 +39,10 @@ function createMedia (options) {
 function deleteMedia(id) {
   return new Promise((resolve, reject) => {
     Media.findByIdAndRemove(id, function (err, media) {
-      if (err) { reject(err) } else {
+      if (err) { reject(err) }
+      else if (media) {
         spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
-        console.log('Successfully deleted ' + id)
+        console.log('DELETE -', id, '-', path.join(media.path, media.filename))
         resolve(media)
       }
     })
