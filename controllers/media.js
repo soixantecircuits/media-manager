@@ -43,7 +43,7 @@ router.get('/last', function (req, res) {
   })
 })
 
-router.get('/:id', function (req, res) {
+router.get('/:id/export', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       res.send(err)
@@ -86,9 +86,15 @@ router.get('/:id/metas', function (req, res) {
   })
 })
 
-router.get('/:id/details/:field', function (req, res) {
+router.get('/:id/:field', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
-    if (err) { res.send(err) } else { res.json(media[req.params.field]) }
+    if (err) {
+      res.send(err)
+    } else if (media) {
+      res.json(media[req.params.field])
+    } else {
+      res.send({ error: 'Not found', id: req.params.id, field: req.params.field })
+    }
   })
 })
 

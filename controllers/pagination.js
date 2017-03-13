@@ -38,7 +38,7 @@ function getURI (request) {
   return request.protocol + '://' + request.get('host') + request.originalUrl
 }
 
-router.get('/:id/details', function (req, res) {
+router.get('/:id', function (req, res) {
   var next = req.query.next
   var prev = req.query.prev
   var curId = req.params.id
