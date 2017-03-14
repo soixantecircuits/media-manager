@@ -11,7 +11,7 @@ var Media = mongoose.model('media', {
   uploadedAt: Date,
   updatedAt: Date,
   meta: Object,
-  mediaDetails: Object
+  details: Object
 })
 
 module.exports = Media

@@ -155,14 +155,17 @@ router.delete('/:id', function (req, res) {
 
 // ----- SPACEBRO EVENTS COMING FROM CHOKIBRO ----- //
 Utils.spacebroClient.on('new-media', function (data) {
-  let filename = path.basename(data.path)
-  let relativePath = path.join(Utils.dateDir(), filename)
-  let absolutePath = path.join(config.dataFolder, relativePath)
-  fs.copySync(data.path, absolutePath)
+  let mediaRelativePath = path.join(Utils.dateDir(), data.file)
+  let mediaAbsolutePath = path.join(config.dataFolder, mediaRelativePath)
+  let thumbnailRelativePath = path.join(Utils.dateDir(), data.details.thumbnail.file)
+  let thumbnailAbsolutePath = path.join(config.dataFolder, thumbnailRelativePath)
+
+  fs.copySync(data.path, mediaAbsolutePath)
+  fs.copySync(data.details.thumbnail.source, thumbnailAbsolutePath)
   Utils.createMedia({
-    file: relativePath,
+    file: mediaRelativePath,
     meta: data.meta,
-    mediaDetails: data.mediaDetails
+    details: data.details
   })
   .catch(error => console.log(error))
 })
