@@ -44,6 +44,17 @@ A `Media` has the following scheme:
   "updatedAt": "some date",
   "meta": {
     "foo": "bar",
+  },
+  "details": {
+    "width": 200,
+    "height": 200,
+    "thumbnail": {
+      "filename": "thumb.jpg",
+      "width": 100,
+      "height": 100,
+      "type": "image/jpg",
+      "source": "www.url.net/thumb.jpg"
+    }
   }
 }
 ```
