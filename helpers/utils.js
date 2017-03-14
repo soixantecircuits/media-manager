@@ -32,7 +32,7 @@ function createMedia (options) {
       newMedia.type = type
       newMedia.path = path.dirname(options.file)
       newMedia.filename = path.basename(options.file)
-      newMedia.mediaDetails = options.mediaDetails
+      newMedia.details = options.details
       newMedia.save(err => {
         if (err) { console.log(err) } else {
           console.log('ADD -', newMedia._id, '-', path.join(newMedia.path, newMedia.filename))
