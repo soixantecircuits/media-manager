@@ -6,7 +6,7 @@ const mh = require('media-helper')
 const express = require('express')
 const router = express.Router()
 const Media = require('../models/media')
-const config = require('../config/config')
+const config = require('nconf').get()
 const Utils = require('../helpers/utils')
 
 // ----- GET ----- //

@@ -3,15 +3,27 @@
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const express = require('express')
-const config = require('./config/config')
+const app = express()
+const port = process.env.PORT || 8080
+const program = require('commander')
+const nconf = require('nconf')
 
+// Reading command line options
+program
+.option('-s, --settings <file>', 'Use a specific settings file')
+.parse(process.argv)
+
+if (program.settings) {
+  nconf.file({ file: program.settings })
+} else {
+  nconf.file({ file: 'settings/settings.default.json' })
+}
+
+const config = nconf.get()
 const Utils = require('./helpers/utils')
 const mediaRouter = require('./controllers/media')
 const bucketRouter = require('./controllers/bucket')
 const paginationRouter = require('./controllers/pagination')
-
-const app = express()
-const port = process.env.PORT || 8080
 
 mongoose.connect('mongodb://localhost/media-manager')
 mongoose.Promise = global.Promise

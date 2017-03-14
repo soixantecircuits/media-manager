@@ -3,7 +3,7 @@
     "address": "localhost",
     "port": 8888
   },
-  "dataFolder": "/path/to/dir",
+  "dataFolder": "/tmp",
   "defaultState": "public",
   "states": ["public", "private", "draft"]
 }

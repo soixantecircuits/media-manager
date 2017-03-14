@@ -2,7 +2,7 @@
 
 const Media = require('../models/media')
 const mh = require('media-helper')
-const config = require('../config/config')
+const config = require('nconf').get()
 const path = require('path')
 const spacebroClient = require('spacebro-client')
 const fs = require('fs-extra')
