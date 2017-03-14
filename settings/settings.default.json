@@ -1,7 +1,9 @@
 {
   "spacebro": {
     "address": "localhost",
-    "port": 8888
+    "port": 8888,
+    "clientName": "media-manager",
+    "channelName": "media-stream",
   },
   "dataFolder": "/tmp",
   "defaultState": "public",

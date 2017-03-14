@@ -9,8 +9,8 @@ const fs = require('fs-extra')
 const moment = require('moment')
 
 spacebroClient.connect(config.spacebro.address, config.spacebro.port, {
-  clientName: 'media-manager',
-  channelName: 'media-stream',
+  clientName: config.spacebro.clientName,
+  channelName: config.spacebro.channelName,
   verbose: false
 })
 
