@@ -54,27 +54,21 @@ router.get('/:id/export', function (req, res) {
   })
 })
 
-router.get('/thumbnail/:id', function (req, res) {
+router.get('/:id/thumbnail', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       res.send(err)
-    } else if (media === null) {
-      res.send({error: 'Media not found'})
-    } else {
-      var details = media.mediaDetails
-      if (!details || !details.thumbnail || typeof details.thumbnail.path !== 'string') {
-        res.send({ error: 'Error while getting the path', details: 'Media path or filename is not a string.' })
+    } else if (media) {
+      if (media.details.thumbnail) {
+        res.redirect(path.join('/static', media.details.thumbnail.source))
       } else {
-        var mediaPath = details.thumbnail.path
-        if (fs.existsSync(mediaPath)) {
-          var data = fs.readFileSync(mediaPath)
-          var mediaType = details.thumbnail.type ? details.thumbnail.type : 'image/jpg'
-          res.contentType(mediaType)
-          res.send(data)
-        } else {
-          res.send({ error: 'File does not exist' })
-        }
+        res.send({ error: 'Not found',
+                   details: 'No thumbnail associated to this media',
+                   id: req.params.id
+                 })
       }
+    } else {
+      res.send({ error: 'Not found', id: req.params.id })
     }
   })
 })
