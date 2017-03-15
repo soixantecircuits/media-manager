@@ -19,8 +19,7 @@ function getMediaCount (stateFilter) {
   })
 }
 
-router.get('/config', function (req, res) {
-  var config = require('../config/config.json')
+router.get('/settings', function (req, res) {
   res.json(config)
 })
 
