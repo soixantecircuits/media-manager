@@ -48,7 +48,7 @@ router.get('/:id/export', function (req, res) {
     if (err) {
       res.send(err)
     } else if (media) {
-      res.redirect(path.join('/static', media.path, media.filename))
+      res.redirect(path.join('/static', media.source))
     } else {
       res.send({ error: 'Not found', id: req.params.id })
     }
@@ -110,7 +110,7 @@ router.post('/', function (req, res) {
   mh.toBase64(media).then(data => {
     fs.writeFileSync(absolutePath, data, 'base64')
     Utils.createMedia({
-      file: relativePath,
+      path: relativePath,
       meta: req.body.meta,
       bucketId: req.body.bucketId
     }).then(media => res.send(media))
@@ -148,12 +148,12 @@ router.delete('/:id', function (req, res) {
   var id = req.params.id
   if (id) {
     Utils.deleteMedia(id)
-    .then(media => fs.unlinkSync(path.join(media.path, media.filename)))
+    .then(media => fs.unlinkSync(path.join(config.dataFolder, media.source)))
     .catch(error => console.log(error))
   }
 })
 
-// ----- SPACEBRO EVENTS COMING FROM CHOKIBRO ----- //
+// ----- SPACEBRO EVENTS ----- //
 Utils.spacebroClient.on('new-media', function (data) {
   let mediaRelativePath = path.join(Utils.dateDir(), data.file)
   let mediaAbsolutePath = path.join(config.dataFolder, mediaRelativePath)
@@ -162,27 +162,13 @@ Utils.spacebroClient.on('new-media', function (data) {
 
   fs.copySync(data.path, mediaAbsolutePath)
   fs.copySync(data.details.thumbnail.source, thumbnailAbsolutePath)
+  data.details.thumbnail.source = thumbnailRelativePath
   Utils.createMedia({
-    file: mediaRelativePath,
+    path: mediaRelativePath,
     meta: data.meta,
     details: data.details
   })
   .catch(error => console.log(error))
 })
-
-// This deletes a media when it is removed from chokibro folder, depreciated //
-/*
-Utils.spacebroClient.on('unlink-media', function (data) {
-  var filename = path.basename(data.path)
-  Media.findOne({filename: filename}, (err, media) => {
-    if (err) { console.log(err) }
-    else if (media) {
-      Utils.deleteMedia(media._id)
-      .then(media => fs.unlinkSync(path.join(media.path, media.filename)))
-      .catch(error => console.log(error))
-    }
-  })
-})
-*/
 
 module.exports = router
