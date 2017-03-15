@@ -11,6 +11,7 @@ const nconf = require('nconf')
 // Reading command line options
 program
 .option('-s, --settings <file>', 'Use a specific settings file')
+.option('-c, --clean', 'Deletes a media when it cannot be found')
 .parse(process.argv)
 
 if (program.settings) {
@@ -53,5 +54,7 @@ app.use('/api/v1/buckets', bucketRouter)
 
 app.listen(port, function () {
   console.log('Listening on port ' + port)
-  Utils.checkIntegrity()
+  if (program.clean) {
+    Utils.checkIntegrity()
+  }
 })
