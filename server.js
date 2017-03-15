@@ -7,6 +7,7 @@ const app = express()
 const port = process.env.PORT || 8080
 const program = require('commander')
 const nconf = require('nconf')
+const fs = require('fs-extra')
 
 // Reading command line options
 program
@@ -26,8 +27,8 @@ const mediaRouter = require('./controllers/media')
 const bucketRouter = require('./controllers/bucket')
 const paginationRouter = require('./controllers/pagination')
 
-mongoose.connect('mongodb://localhost/media-manager')
 mongoose.Promise = global.Promise
+mongoose.connect('mongodb://localhost/media-manager')
 
 const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
@@ -54,6 +55,7 @@ app.use('/api/v1/buckets', bucketRouter)
 
 app.listen(port, function () {
   console.log('Listening on port ' + port)
+  fs.ensureDirSync(config.dataFolder)
   if (program.clean) {
     Utils.checkIntegrity()
   }
