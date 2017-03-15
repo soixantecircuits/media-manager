@@ -2,6 +2,7 @@
 
 const fs = require('fs-extra')
 const path = require('path')
+const download = require('download')
 const mh = require('media-helper')
 const express = require('express')
 const router = express.Router()
@@ -146,22 +147,45 @@ router.delete('/:id', function (req, res) {
   }
 })
 
+function toDataFolder(msg) {
+  return new Promise((resolve, reject) => {
+
+    let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
+    let mediaAbsolutePath = path.join(config.dataFolder, mediaRelativePath)
+    let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
+    let thumbnailAbsolutePath = path.join(config.dataFolder, thumbnailRelativePath)
+
+    if (mh.isFile(msg.path)) {
+      fs.copySync(msg.path, mediaAbsolutePath)
+      fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
+      return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
+
+    } else if (mh.isURL(msg.path)) {
+      download(msg.path)
+      .then(data => {
+        fs.writeFileSync(mediaAbsolutePath, data)
+        download(msg.details.thumbnail.source)
+        .then(data => {
+          fs.writeFileSync(thumbnailAbsolutePath, data)
+          return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
+        }).catch(err => reject(err))
+      }).catch(err => reject(err))
+    }
+  })
+}
+
 // ----- SPACEBRO EVENTS ----- //
 Utils.spacebroClient.on('new-media', function (data) {
-  let mediaRelativePath = path.join(Utils.dateDir(), data.file)
-  let mediaAbsolutePath = path.join(config.dataFolder, mediaRelativePath)
-  let thumbnailRelativePath = path.join(Utils.dateDir(), data.details.thumbnail.file)
-  let thumbnailAbsolutePath = path.join(config.dataFolder, thumbnailRelativePath)
+  toDataFolder(data)
+  .then(paths => {
+    data.details.thumbnail.source = paths.thumbnail
+    Utils.createMedia({
+      path: paths.media,
+      meta: data.meta,
+      details: data.details
+    }).catch(error => console.log(error))
 
-  fs.copySync(data.path, mediaAbsolutePath)
-  fs.copySync(data.details.thumbnail.source, thumbnailAbsolutePath)
-  data.details.thumbnail.source = thumbnailRelativePath
-  Utils.createMedia({
-    path: mediaRelativePath,
-    meta: data.meta,
-    details: data.details
-  })
-  .catch(error => console.log(error))
+  }).catch(error => console.log(error))
 })
 
 module.exports = router
