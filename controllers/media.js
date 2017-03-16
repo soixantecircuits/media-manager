@@ -172,6 +172,8 @@ function toDataFolder(msg) {
           return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
         }).catch(err => reject(err))
       }).catch(err => reject(err))
+    } else {
+      reject('Error: ', msg.path, 'is not a file or an URL')
     }
   })
 }
