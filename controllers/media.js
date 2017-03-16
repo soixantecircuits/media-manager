@@ -156,11 +156,13 @@ function toDataFolder(msg) {
     let thumbnailAbsolutePath = path.join(config.dataFolder, thumbnailRelativePath)
 
     if (mh.isFile(msg.path)) {
+      console.log("--> Copying new media to " + path.dirname(mediaAbsolutePath))
       fs.copySync(msg.path, mediaAbsolutePath)
       fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
       return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
 
     } else if (mh.isURL(msg.path)) {
+      console.log("--> Downloading new media to " + path.dirname(mediaAbsolutePath))
       download(msg.path)
       .then(data => {
         fs.writeFileSync(mediaAbsolutePath, data)
@@ -176,6 +178,7 @@ function toDataFolder(msg) {
 
 // ----- SPACEBRO EVENTS ----- //
 Utils.spacebroClient.on('new-media', function (data) {
+  console.log('EVENT - "new-media" received')
   toDataFolder(data)
   .then(paths => {
     data.details.thumbnail.path = paths.thumbnail
@@ -184,8 +187,9 @@ Utils.spacebroClient.on('new-media', function (data) {
       path: paths.media,
       meta: data.meta,
       details: data.details
-    }).catch(error => console.log(error))
-
+    })
+    .then(media => console.log('ADD -', media._id, '-', media.path))
+    .catch(error => console.log(error))
   }).catch(error => console.log(error))
 })
 

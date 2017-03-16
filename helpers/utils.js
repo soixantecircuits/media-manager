@@ -36,7 +36,6 @@ function createMedia (options) {
       newMedia.details = options.details
       newMedia.save(err => {
         if (err) { console.log(err) } else {
-          console.log('ADD -', newMedia._id, '-', newMedia.path)
           spacebroClient.emit('media-to-db', newMedia)
           resolve(newMedia)
         }
@@ -68,7 +67,7 @@ function checkIntegrity() {
           Media.findByIdAndRemove(media._id, function (err, media) {
             if (err) { return console.log(err) } else {
               spacebroClient.emit('media-deleted', {mediaId: media._id, bucketId: media.bucketId})
-              console.log(media._id.toString(), 'has been deleted: file not found')
+              console.log('DELETE -', media._id.toString(), '-', media.path)
             }
           })
         }

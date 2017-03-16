@@ -56,7 +56,9 @@ app.use('/api/v1/medias', paginationRouter)
 app.use('/api/v1/buckets', bucketRouter)
 
 app.listen(port, function () {
-  console.log('Listening on port ' + port)
+  console.log('--- MEDIA-MANAGER ---')
+  console.log('address:', ip.address())
+  console.log('port:', port)
   fs.ensureDirSync(config.dataFolder)
   if (program.clean) {
     Utils.checkIntegrity()
