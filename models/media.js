@@ -3,6 +3,7 @@ var Schema = mongoose.Schema
 
 var Media = mongoose.model('media', {
   file: String,
+  path: String,
   source: String,
   type: String,
   bucketId: Schema.Types.ObjectId,

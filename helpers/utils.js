@@ -30,12 +30,13 @@ function createMedia (options) {
       newMedia.uploadedAt = new Date().toISOString()
       newMedia.state = config.defaultState
       newMedia.type = type
-      newMedia.source = options.path
+      newMedia.path = options.path
+      newMedia.source = config.baseURL + 'static/' + options.path
       newMedia.file = path.basename(options.path)
       newMedia.details = options.details
       newMedia.save(err => {
         if (err) { console.log(err) } else {
-          console.log('ADD -', newMedia._id, '-', newMedia.source)
+          console.log('ADD -', newMedia._id, '-', newMedia.path)
           spacebroClient.emit('media-to-db', newMedia)
           resolve(newMedia)
         }
@@ -51,7 +52,7 @@ function deleteMedia(id) {
       if (err) { reject(err) }
       else if (media) {
         spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
-        console.log('DELETE -', id, '-', media.source)
+        console.log('DELETE -', id, '-', media.path)
         resolve(media)
       }
     })
@@ -62,7 +63,7 @@ function checkIntegrity() {
   Media.find().exec((err, medias) => {
     if (err) { return console.log(err) } else {
       medias.forEach(media => {
-        var mediaPath = path.join(config.dataFolder, media.source)
+        var mediaPath = path.join(config.dataFolder, media.path)
         if (mh.isFile(mediaPath) === false) {
           Media.findByIdAndRemove(media._id, function (err, media) {
             if (err) { return console.log(err) } else {

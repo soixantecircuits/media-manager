@@ -48,7 +48,7 @@ router.get('/:id/export', function (req, res) {
     if (err) {
       res.send(err)
     } else if (media) {
-      res.redirect(path.join('/static', media.source))
+      res.redirect(path.join('/static', media.path))
     } else {
       res.send({ error: 'Not found', id: req.params.id })
     }
@@ -142,7 +142,7 @@ router.delete('/:id', function (req, res) {
   var id = req.params.id
   if (id) {
     Utils.deleteMedia(id)
-    .then(media => fs.unlinkSync(path.join(config.dataFolder, media.source)))
+    .then(media => fs.unlinkSync(path.join(config.dataFolder, media.path)))
     .catch(error => console.log(error))
   }
 })
@@ -178,7 +178,8 @@ function toDataFolder(msg) {
 Utils.spacebroClient.on('new-media', function (data) {
   toDataFolder(data)
   .then(paths => {
-    data.details.thumbnail.source = paths.thumbnail
+    data.details.thumbnail.path = paths.thumbnail
+    data.details.thumbnail.source = config.baseURL + 'static/' + paths.thumbnail
     Utils.createMedia({
       path: paths.media,
       meta: data.meta,

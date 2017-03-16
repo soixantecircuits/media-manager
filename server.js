@@ -8,6 +8,7 @@ const port = process.env.PORT || 8080
 const program = require('commander')
 const nconf = require('nconf')
 const fs = require('fs-extra')
+const ip = require("ip")
 
 // Reading command line options
 program
@@ -20,6 +21,7 @@ if (program.settings) {
 } else {
   nconf.file({ file: 'settings/settings.default.json' })
 }
+nconf.set('baseURL', 'http://' + ip.address() + ':' + port + '/')
 
 const config = nconf.get()
 const Utils = require('./helpers/utils')
