@@ -171,7 +171,7 @@ function toDataFolder (msg) {
         }).catch(err => reject(err))
       }).catch(err => reject(err))
     } else {
-      reject('Error: ' + msg.path + 'is not a file or an URL')
+      reject(new Error(`Error: ${msg.path} is not a file or an URL`))
     }
   })
 }
