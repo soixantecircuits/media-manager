@@ -56,6 +56,10 @@ app.use('/api/v1/medias', mediaRouter)
 app.use('/api/v1/medias', paginationRouter)
 app.use('/api/v1/buckets', bucketRouter)
 
+app.get('/', function (req, res) {
+  res.json({ service: 'media-manager', status: 'running', settings: config })
+})
+
 app.listen(port, function () {
   winston.info('address:', ip.address())
   winston.info('port:', port)
