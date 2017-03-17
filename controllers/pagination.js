@@ -34,9 +34,12 @@ router.get('/', function (req, res) {
   })
 })
 
+/**
+ * Dead code getURI is not used
 function getURI (request) {
   return request.protocol + '://' + request.get('host') + request.originalUrl
 }
+**/
 
 router.get('/:id', function (req, res) {
   var next = req.query.next

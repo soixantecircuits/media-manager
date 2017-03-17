@@ -64,9 +64,9 @@ router.get('/:id/thumbnail', function (req, res) {
         res.redirect(path.join('/static', media.details.thumbnail.source))
       } else {
         res.send({ error: 'Not found',
-                   details: 'No thumbnail associated to this media',
-                   id: req.params.id
-                 })
+          details: 'No thumbnail associated to this media',
+          id: req.params.id
+        })
       }
     } else {
       res.send({ error: 'Not found', id: req.params.id })
@@ -147,22 +147,20 @@ router.delete('/:id', function (req, res) {
   }
 })
 
-function toDataFolder(msg) {
+function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
-
     let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
     let mediaAbsolutePath = path.join(config.dataFolder, mediaRelativePath)
     let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
     let thumbnailAbsolutePath = path.join(config.dataFolder, thumbnailRelativePath)
 
     if (mh.isFile(msg.path)) {
-      console.log("--> Copying new media to " + path.dirname(mediaAbsolutePath))
+      console.log('--> Copying new media to ' + path.dirname(mediaAbsolutePath))
       fs.copySync(msg.path, mediaAbsolutePath)
       fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
       return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
-
     } else if (mh.isURL(msg.path)) {
-      console.log("--> Downloading new media to " + path.dirname(mediaAbsolutePath))
+      console.log('--> Downloading new media to ' + path.dirname(mediaAbsolutePath))
       download(msg.path)
       .then(data => {
         fs.writeFileSync(mediaAbsolutePath, data)

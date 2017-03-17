@@ -15,7 +15,7 @@ spacebroClient.connect(config.spacebro.address, config.spacebro.port, {
 })
 
 function dateDir () {
-  var today = moment().format("YYYY-MMMM-DD")
+  var today = moment().format('YYYY-MMMM-DD')
   fs.ensureDirSync(path.join(config.dataFolder, today))
   return (today)
 }
@@ -45,11 +45,10 @@ function createMedia (options) {
   })
 }
 
-function deleteMedia(id) {
+function deleteMedia (id) {
   return new Promise((resolve, reject) => {
     Media.findByIdAndRemove(id, function (err, media) {
-      if (err) { reject(err) }
-      else if (media) {
+      if (err) { reject(err) } else if (media) {
         spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
         console.log('DELETE -', id, '-', media.path)
         resolve(media)
@@ -58,7 +57,7 @@ function deleteMedia(id) {
   })
 }
 
-function checkIntegrity() {
+function checkIntegrity () {
   Media.find().exec((err, medias) => {
     if (err) { return console.log(err) } else {
       medias.forEach(media => {

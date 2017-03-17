@@ -8,7 +8,7 @@ const port = process.env.PORT || 8080
 const program = require('commander')
 const nconf = require('nconf')
 const fs = require('fs-extra')
-const ip = require("ip")
+const ip = require('ip')
 
 // Reading command line options
 program
