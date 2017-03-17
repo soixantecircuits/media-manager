@@ -28,7 +28,17 @@ Example:
     "path": "path to a file / url",
     "file": "myFile.jpg",
     "type": "image/jpg",
-    "details": { }
+    "details": {
+      "width": 1024,
+      "height": 1024,
+      "thumbnail": {
+        "file": "myThumb.jpg",
+        "width": 128,
+        "height": 128,
+        "type": "image/jpg",
+        "source": "path to a file / url"
+      }
+    }
   }
 ```
 
@@ -48,11 +58,12 @@ Example:
       "width": 128,
       "height": 128,
       "type": "image/jpg",
-      "source": "path/to/thumb.jpg"
+      "source": "http://media-manager.url/route/to/thumb"
     }
   },
   "file": "media.gif",
-  "source": "path/to/media.gif",
+  "path": "path/to/media.gif",
+  "source": "http://media-manager.url/route/to/media",
   "type": "image/gif",
   "state": "public",
   "uploadedAt": "2017-03-15T09:42:00.135Z",
@@ -68,7 +79,7 @@ Returns the total amount of media in the database.
 
 #### GET `api/v1/medias/:id/:field`
 Returns the specified field from the media's json.  
-Example: `GET /api/v1/medias/58c90c689882891f79b79066/source`  
+Example: `GET /api/v1/medias/58c90c689882891f79b79066/path`  
 ```json
   "path/to/media.gif"
 ```
