@@ -11,13 +11,13 @@ const Media = require('../models/media')
 const config = require('nconf').get()
 const Utils = require('../helpers/utils')
 
-function notFound(id) {
+function notFound (id) {
   let error = 'Media not found'
   winston.warn(error, { id: id })
   return { error: error, id: id }
 }
 
-function emptyField(field, id) {
+function emptyField (field, id) {
   let error = 'Empty field'
   winston.warn(error, { field: field, id: id })
   return { error: error, field: field, id: id }
@@ -186,7 +186,7 @@ router.delete('/:id', function (req, res) {
     fs.unlinkSync(path.join(config.dataFolder, media.path))
     res.send(media)
   })
-  .catch(error =>  {
+  .catch(error => {
     winston.error(error)
     res.send(error)
   })
