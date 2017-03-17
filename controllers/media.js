@@ -4,11 +4,24 @@ const fs = require('fs-extra')
 const path = require('path')
 const download = require('download')
 const mh = require('media-helper')
+const winston = require('winston')
 const express = require('express')
 const router = express.Router()
 const Media = require('../models/media')
 const config = require('nconf').get()
 const Utils = require('../helpers/utils')
+
+function notFound(id) {
+  let error = 'Media not found'
+  winston.warn(error, { id: id })
+  return { error: error, id: id }
+}
+
+function emptyField(field, id) {
+  let error = 'Empty field'
+  winston.warn(error, { field: field, id: id })
+  return { error: error, field: field, id: id }
+}
 
 // ----- GET ----- //
 function getMediaCount (stateFilter) {
@@ -33,24 +46,35 @@ router.get('/count', function (req, res) {
 
 router.get('/first', function (req, res) {
   Media.findOne().sort({uploadedAt: 1}).exec((err, media) => {
-    if (err) { console.log(err) } else { res.json(media) }
+    if (err) {
+      winston.error(err)
+      res.send(err)
+    } else if (!media) {
+      res.send(notFound())
+    } else { res.json(media) }
   })
 })
 
 router.get('/last', function (req, res) {
-  Media.findOne().sort({uploadedAt: -1}).exec((err, media) => {
-    if (err) { console.log(err) } else { res.json(media) }
+  Media.findOne().sort({uploadedAt: 1}).exec((err, media) => {
+    if (err) {
+      winston.error(err)
+      res.send(err)
+    } else if (!media) {
+      res.send(notFound())
+    } else { res.json(media) }
   })
 })
 
 router.get('/:id/export', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
+      winston.error(err)
       res.send(err)
-    } else if (media) {
-      res.redirect(path.join('/static', media.path))
+    } else if (!media) {
+      res.send(notFound(req.params.id))
     } else {
-      res.send({ error: 'Not found', id: req.params.id })
+      res.redirect(path.join('/static', media.path))
     }
   })
 })
@@ -58,36 +82,36 @@ router.get('/:id/export', function (req, res) {
 router.get('/:id/thumbnail', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
+      winston.error(err)
       res.send(err)
     } else if (media) {
       if (media.details.thumbnail) {
         res.redirect(path.join('/static', media.details.thumbnail.source))
-      } else {
-        res.send({ error: 'Not found',
-          details: 'No thumbnail associated to this media',
-          id: req.params.id
-        })
-      }
-    } else {
-      res.send({ error: 'Not found', id: req.params.id })
-    }
+      } else { res.send(emptyField('details.thumbnail', req.params.id)) }
+    } else { res.send(notFound(req.params.id)) }
   })
 })
 
 router.get('/:id/metas', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
-    if (err) { res.send(err) } else { res.json(media.meta) }
+    if (err) {
+      winston.error(err)
+      res.send(err)
+    } else if (!media) {
+      res.send(notFound(req.params.id))
+    } else { res.json(media.meta) }
   })
 })
 
 router.get('/:id/:field', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
+      winston.error(err)
       res.send(err)
-    } else if (media) {
-      res.json(media[req.params.field])
+    } else if (!media) {
+      res.send(notFound(req.params.id))
     } else {
-      res.send({ error: 'Not found', id: req.params.id, field: req.params.field })
+      res.json(media[req.params.field])
     }
   })
 })
@@ -96,7 +120,7 @@ router.get('/:id/:field', function (req, res) {
 router.post('/', function (req, res) {
   var media = req.body.media
   var filename = req.body.filename
-  if (media === undefined) { res.send('Error: media field undefined') }
+  if (!media) { res.send('Error: media field undefined') }
   if (filename === undefined) { res.send('Error: filename field undefined') }
 
   var relativePath = path.join(Utils.dateDir(), filename)

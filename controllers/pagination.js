@@ -2,6 +2,7 @@
 
 const router = require('express').Router()
 const Media = require('../models/media')
+const winston = require('winston')
 
 router.get('/', function (req, res) {
   var state = req.query.state
@@ -55,9 +56,13 @@ router.get('/:id', function (req, res) {
     query = Media.findById(curId)
   }
   query.exec((err, media) => {
-    if (err) { res.send(err) } else {
-      res.json(media)
-    }
+    if (err) {
+      winston.error(err)
+      res.send(err)
+    } else if (!media) {
+      winston.error('Media not found')
+      res.send({ error: 'Media not found', id: curId })
+    } else { res.json(media) }
   })
 })
 

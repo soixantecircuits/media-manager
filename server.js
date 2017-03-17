@@ -9,6 +9,7 @@ const program = require('commander')
 const nconf = require('nconf')
 const fs = require('fs-extra')
 const ip = require('ip')
+const winston = require('winston')
 
 // Reading command line options
 program
@@ -35,7 +36,7 @@ mongoose.connect('mongodb://localhost/media-manager')
 const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error:'))
 db.once('open', function () {
-  console.log('Mongoose successfully connected')
+  winston.info('connection to database established')
 })
 
 // CORS middleware
@@ -56,9 +57,8 @@ app.use('/api/v1/medias', paginationRouter)
 app.use('/api/v1/buckets', bucketRouter)
 
 app.listen(port, function () {
-  console.log('--- MEDIA-MANAGER ---')
-  console.log('address:', ip.address())
-  console.log('port:', port)
+  winston.info('address:', ip.address())
+  winston.info('port:', port)
   fs.ensureDirSync(config.dataFolder)
   if (program.clean) {
     Utils.checkIntegrity()
