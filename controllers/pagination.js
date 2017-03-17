@@ -18,11 +18,14 @@ router.get('/', function (req, res) {
   }
 
   query.exec((err, medias) => {
-    if (err) { res.send(err) } else {
+    if (err) {
+      winston.error(err)
+      res.send(err)
+    } else {
       var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl.split('?').shift()
       var response = {
         data: medias,
-        dataType: 'medias'
+        dataType: 'media'
       }
       if (medias.length === perPage) {
         response.nextPage = fullUrl + '?page=' + (page + 1) + '&per_page=' + perPage
@@ -34,13 +37,6 @@ router.get('/', function (req, res) {
     }
   })
 })
-
-/**
- * Dead code getURI is not used
-function getURI (request) {
-  return request.protocol + '://' + request.get('host') + request.originalUrl
-}
-**/
 
 router.get('/:id', function (req, res) {
   var next = req.query.next

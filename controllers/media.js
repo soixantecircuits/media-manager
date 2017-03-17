@@ -111,7 +111,9 @@ router.get('/:id/:field', function (req, res) {
     } else if (!media) {
       res.send(notFound(req.params.id))
     } else {
-      res.json(media[req.params.field])
+      if (media[req.params.field] !== undefined) {
+        res.json(media[req.params.field])
+      } else { res.send(emptyField(req.params.field, req.params.id)) }
     }
   })
 })
@@ -120,8 +122,8 @@ router.get('/:id/:field', function (req, res) {
 router.post('/', function (req, res) {
   var media = req.body.media
   var filename = req.body.filename
-  if (!media) { res.send('Error: media field undefined') }
-  if (filename === undefined) { res.send('Error: filename field undefined') }
+  if (media === undefined) { res.send(emptyField('media')) }
+  if (filename === undefined) { res.send(emptyField('filename')) }
 
   var relativePath = path.join(Utils.dateDir(), filename)
   var absolutePath = path.join(config.dataFolder, relativePath)
@@ -131,7 +133,12 @@ router.post('/', function (req, res) {
       path: relativePath,
       meta: req.body.meta,
       bucketId: req.body.bucketId
-    }).then(media => res.send(media))
+    })
+    .then(media => {
+      winston.info('ADD -', media._id, '-', media.path)
+      res.send(media)
+    })
+    .catch(error => res.send(error))
   })
   .catch(error => res.send(error))
 })
@@ -139,7 +146,12 @@ router.post('/', function (req, res) {
 // ----- PUT ----- //
 router.put('/:id', function (req, res) {
   Media.findById(req.params.id, (err, media) => {
-    if (err) { res.send(err) } else {
+    if (err) {
+      winston.error(err)
+      res.send(err)
+    } else if (!media) {
+      res.send(notFound(req.params.id))
+    } else {
       var spacebroData = {mediaId: media._id}
       if (req.body.state && req.body.state !== media.state) {
         media.state = req.body.state
@@ -152,8 +164,13 @@ router.put('/:id', function (req, res) {
       if (req.body.state || req.body.bucketId) {
         media.updatedAt = new Date().toISOString()
         media.save(err => {
-          if (err) { res.send(err) } else { console.log('UPDATE -', media._id) }
-          Utils.spacebroClient.emit('media-updated', spacebroData)
+          if (err) {
+            winston.error(err)
+            res.send(err)
+          } else {
+            winston.info('UPDATE -', media._id)
+            Utils.spacebroClient.emit('media-updated', spacebroData)
+          }
         })
       }
       res.json(media)
@@ -164,11 +181,15 @@ router.put('/:id', function (req, res) {
 // ----- DELETE ----- //
 router.delete('/:id', function (req, res) {
   var id = req.params.id
-  if (id) {
-    Utils.deleteMedia(id)
-    .then(media => fs.unlinkSync(path.join(config.dataFolder, media.path)))
-    .catch(error => console.log(error))
-  }
+  Utils.deleteMedia(id)
+  .then(media => {
+    fs.unlinkSync(path.join(config.dataFolder, media.path))
+    res.send(media)
+  })
+  .catch(error =>  {
+    winston.error(error)
+    res.send(error)
+  })
 })
 
 function toDataFolder (msg) {
@@ -179,12 +200,12 @@ function toDataFolder (msg) {
     let thumbnailAbsolutePath = path.join(config.dataFolder, thumbnailRelativePath)
 
     if (mh.isFile(msg.path)) {
-      console.log('--> Copying new media to ' + path.dirname(mediaAbsolutePath))
+      winston.info('Copying new media to ' + path.dirname(mediaAbsolutePath))
       fs.copySync(msg.path, mediaAbsolutePath)
       fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
       return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
     } else if (mh.isURL(msg.path)) {
-      console.log('--> Downloading new media to ' + path.dirname(mediaAbsolutePath))
+      winston.info('Downloading new media to ' + path.dirname(mediaAbsolutePath))
       download(msg.path)
       .then(data => {
         fs.writeFileSync(mediaAbsolutePath, data)
@@ -202,7 +223,7 @@ function toDataFolder (msg) {
 
 // ----- SPACEBRO EVENTS ----- //
 Utils.spacebroClient.on('new-media', function (data) {
-  console.log('EVENT - "new-media" received')
+  winston.info('EVENT - "new-media" received')
   toDataFolder(data)
   .then(paths => {
     data.details.thumbnail.path = paths.thumbnail
@@ -212,9 +233,9 @@ Utils.spacebroClient.on('new-media', function (data) {
       meta: data.meta,
       details: data.details
     })
-    .then(media => console.log('ADD -', media._id, '-', media.path))
-    .catch(error => console.log(error))
-  }).catch(error => console.log(error))
+    .then(media => winston.info('ADD -', media._id, '-', media.path))
+    .catch(error => winston.error(error))
+  }).catch(error => winston.error(error))
 })
 
 module.exports = router

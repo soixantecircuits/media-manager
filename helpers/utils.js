@@ -2,6 +2,7 @@
 
 const Media = require('../models/media')
 const mh = require('media-helper')
+const winston = require('winston')
 const config = require('nconf').get()
 const path = require('path')
 const spacebroClient = require('spacebro-client')
@@ -35,7 +36,7 @@ function createMedia (options) {
       newMedia.file = path.basename(options.path)
       newMedia.details = options.details
       newMedia.save(err => {
-        if (err) { console.log(err) } else {
+        if (err) { winston.error(err) } else {
           spacebroClient.emit('media-to-db', newMedia)
           resolve(newMedia)
         }
@@ -50,7 +51,7 @@ function deleteMedia (id) {
     Media.findByIdAndRemove(id, function (err, media) {
       if (err) { reject(err) } else if (media) {
         spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
-        console.log('DELETE -', id, '-', media.path)
+        winston.info('DELETE -', id, '-', media.path)
         resolve(media)
       }
     })
@@ -59,14 +60,14 @@ function deleteMedia (id) {
 
 function checkIntegrity () {
   Media.find().exec((err, medias) => {
-    if (err) { return console.log(err) } else {
+    if (err) { return winston.error(err) } else {
       medias.forEach(media => {
         var mediaPath = path.join(config.dataFolder, media.path)
         if (mh.isFile(mediaPath) === false) {
           Media.findByIdAndRemove(media._id, function (err, media) {
             if (err) { return console.log(err) } else {
               spacebroClient.emit('media-deleted', {mediaId: media._id, bucketId: media.bucketId})
-              console.log('DELETE -', media._id.toString(), '-', media.path)
+              winston.info('DELETE -', media._id.toString(), '-', media.path)
             }
           })
         }
