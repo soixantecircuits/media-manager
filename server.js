@@ -27,9 +27,9 @@ nconf.set('baseURL', 'http://' + ip.address() + ':' + port + '/')
 
 const config = nconf.get()
 const Utils = require('./helpers/utils')
-const mediaRouter = require('./controllers/media')
-const bucketRouter = require('./controllers/bucket')
-const paginationRouter = require('./controllers/pagination')
+const mediaRouter = require('./routes/media.route.js')
+const bucketRouter = require('./routes/bucket.route.js')
+const paginationRouter = require('./routes/pagination.route.js')
 
 mongoose.Promise = global.Promise
 mongoose.connect('mongodb://localhost/media-manager')

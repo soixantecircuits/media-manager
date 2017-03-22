@@ -1,10 +1,10 @@
 'use strict'
 
-const router = require('express').Router()
 const Media = require('../models/media')
 const winston = require('winston')
 
-router.get('/', function (req, res) {
+//router.get('/', function (req, res) {
+function getAllMedia (req, res) {
   var state = req.query.state
   var page = Number(req.query.page)
   var perPage = Number(req.query.per_page)
@@ -36,9 +36,10 @@ router.get('/', function (req, res) {
       res.json(response)
     }
   })
-})
+}
 
-router.get('/:id', function (req, res) {
+//router.get('/:id', function (req, res) {
+function getMediaData (req, res) {
   var next = req.query.next
   var prev = req.query.prev
   var curId = req.params.id
@@ -60,6 +61,9 @@ router.get('/:id', function (req, res) {
       res.send({ error: 'Media not found', id: curId })
     } else { res.json(media) }
   })
-})
+}
 
-module.exports = router
+module.exports = {
+  getAllMedia,
+  getMediaData
+}

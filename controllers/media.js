@@ -5,8 +5,6 @@ const path = require('path')
 const download = require('download')
 const mh = require('media-helper')
 const winston = require('winston')
-const express = require('express')
-const router = express.Router()
 const Media = require('../models/media')
 const config = require('nconf').get()
 const Utils = require('../helpers/utils')
@@ -23,7 +21,6 @@ function emptyField (field, id) {
   return { error: error, field: field, id: id }
 }
 
-// ----- GET ----- //
 function getMediaCount (stateFilter) {
   return new Promise((resolve, reject) => {
     var criteria = (stateFilter === undefined) ? {} : {state: stateFilter}
@@ -33,18 +30,18 @@ function getMediaCount (stateFilter) {
   })
 }
 
-router.get('/settings', function (req, res) {
+function getSettings (req, res) {
   res.json(config)
-})
+}
 
-router.get('/count', function (req, res) {
+function getCount (req, res) {
   res.contentType('text/plain')
   getMediaCount(req.query.state)
   .then(count => res.send(count.toString()))
   .catch(error => res.send(error))
-})
+}
 
-router.get('/first', function (req, res) {
+function getFirst (req, res) {
   Media.findOne().sort({uploadedAt: 1}).exec((err, media) => {
     if (err) {
       winston.error(err)
@@ -53,9 +50,9 @@ router.get('/first', function (req, res) {
       res.send(notFound())
     } else { res.json(media) }
   })
-})
+}
 
-router.get('/last', function (req, res) {
+function getLast (req, res) {
   Media.findOne().sort({uploadedAt: 1}).exec((err, media) => {
     if (err) {
       winston.error(err)
@@ -64,9 +61,9 @@ router.get('/last', function (req, res) {
       res.send(notFound())
     } else { res.json(media) }
   })
-})
+}
 
-router.get('/:id/export', function (req, res) {
+function getMedia (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       winston.error(err)
@@ -77,9 +74,9 @@ router.get('/:id/export', function (req, res) {
       res.redirect(path.join('/static', media.path))
     }
   })
-})
+}
 
-router.get('/:id/thumbnail', function (req, res) {
+function getThumbnail (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       winston.error(err)
@@ -90,20 +87,9 @@ router.get('/:id/thumbnail', function (req, res) {
       } else { res.send(emptyField('details.thumbnail', req.params.id)) }
     } else { res.send(notFound(req.params.id)) }
   })
-})
+}
 
-router.get('/:id/metas', function (req, res) {
-  Media.findById(req.params.id, (err, media) => {
-    if (err) {
-      winston.error(err)
-      res.send(err)
-    } else if (!media) {
-      res.send(notFound(req.params.id))
-    } else { res.json(media.meta) }
-  })
-})
-
-router.get('/:id/:field', function (req, res) {
+function getField (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       winston.error(err)
@@ -116,10 +102,9 @@ router.get('/:id/:field', function (req, res) {
       } else { res.send(emptyField(req.params.field, req.params.id)) }
     }
   })
-})
+}
 
-// ----- POST ----- //
-router.post('/', function (req, res) {
+function postMedia (req, res) {
   var media = req.body.media
   var filename = req.body.filename
   if (media === undefined) { res.send(emptyField('media')) }
@@ -141,10 +126,9 @@ router.post('/', function (req, res) {
     .catch(error => res.send(error))
   })
   .catch(error => res.send(error))
-})
+}
 
-// ----- PUT ----- //
-router.put('/:id', function (req, res) {
+function updateMedia (req, res) {
   Media.findById(req.params.id, (err, media) => {
     if (err) {
       winston.error(err)
@@ -176,10 +160,9 @@ router.put('/:id', function (req, res) {
       res.json(media)
     }
   })
-})
+}
 
-// ----- DELETE ----- //
-router.delete('/:id', function (req, res) {
+function deleteMedia (req, res) {
   var id = req.params.id
   Utils.deleteMedia(id)
   .then(media => {
@@ -190,7 +173,7 @@ router.delete('/:id', function (req, res) {
     winston.error(error)
     res.send(error)
   })
-})
+}
 
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
@@ -238,4 +221,15 @@ Utils.spacebroClient.on('new-media', function (data) {
   }).catch(error => winston.error(error))
 })
 
-module.exports = router
+module.exports = {
+  getSettings,
+  getCount,
+  getFirst,
+  getLast,
+  getMedia,
+  getThumbnail,
+  getField,
+  postMedia,
+  updateMedia,
+  deleteMedia
+}

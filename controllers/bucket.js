@@ -2,8 +2,6 @@
 
 const Bucket = require('../models/bucket')
 const Media = require('../models/media')
-const express = require('express')
-const router = express.Router()
 const Utils = require('../helpers/utils')
 
 function slugify (text) {
@@ -55,8 +53,7 @@ Utils.spacebroClient.on('media-deleted', function (data) {
   }
 })
 
-// ----- POST ----- //
-router.post('/', function (req, res) {
+function postBucket (req, res) {
   var name = req.body.name
   if (name === undefined) {
     res.send('Error: name field undefined')
@@ -75,10 +72,9 @@ router.post('/', function (req, res) {
       }
     })
   }
-})
+}
 
-// ----- GET ----- //
-router.get('/', function (req, res) {
+function getAllBuckets (req, res) {
   Bucket.find().exec((err, buckets) => {
     if (err) { res.send(err) } else {
       var len = buckets.length
@@ -91,42 +87,49 @@ router.get('/', function (req, res) {
       })
     }
   })
-})
+}
 
-router.get('/count', function (req, res) {
+function getBucketCount (req, res) {
   res.contentType('text/plain')
   Bucket.count({}, (err, count) => {
     if (err) { res.send(err) } else { res.send(count.toString()) }
   })
-})
+}
 
-router.get('/first', function (req, res) {
+function getFirstBucket (req, res) {
   Bucket.findOne().sort({createdAt: 1})
   .exec((err, first) => {
     if (err) { res.send(err) } else { res.json(first) }
   })
-})
+}
 
-router.get('/last', function (req, res) {
+function getLastBucket (req, res) {
   Bucket.findOne().sort({createdAt: -1})
   .exec((err, post) => {
     if (err) { res.send(err) } else { res.json(post) }
   })
-})
+}
 
-router.get('/:id', function (req, res) {
+function getBucket (req, res) {
   Bucket.findById(req.params.id, (err, bucket) => {
     if (err) { res.send(err) } else { res.json(bucket) }
   })
-})
+}
 
-// ----- DELETE ----- //
-router.delete('/:id', function (req, res) {
+function deleteBucket (req, res) {
   var id = req.params.id
   Bucket.remove({_id: id},
   (err, bucket) => {
     if (err) { res.send(err) } else { res.send('Successfully deleted ' + id + ' bucket') }
   })
-})
+}
 
-module.exports = router
+module.exports = {
+  postBucket,
+  getAllBuckets,
+  getBucketCount,
+  getFirstBucket,
+  getLastBucket,
+  getBucket,
+  deleteBucket
+}
