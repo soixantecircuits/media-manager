@@ -6,7 +6,8 @@ const mongoose = require('mongoose')
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const port = process.env.PORT || settings.app.server.port
+const server = settings.app.server
+const port = process.env.PORT || server.port
 
 const fs = require('fs-extra')
 const ip = require('ip')
@@ -39,7 +40,7 @@ app.get('/', function (req, res) {
   res.json({ service: 'media-manager', status: 'running', settings: settings })
 })
 
-app.listen(port, function () {
+app.listen(port, server.host, function () {
   winston.info('host:', ip.address())
   winston.info('port:', port)
   fs.ensureDirSync(settings.app.dataFolder)

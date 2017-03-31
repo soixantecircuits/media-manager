@@ -12,7 +12,7 @@
       "host": "localhost",
       "port": 8008
     },
-    "dataFolder": "/Users/mina/Desktop/mm-data",
+    "dataFolder": "/tmp/media-manager",
     "defaultState": "public",
     "states": ["public", "private", "draft"]
   }
