@@ -6,7 +6,7 @@ const download = require('download')
 const mh = require('media-helper')
 const winston = require('winston')
 const Media = require('../models/media')
-const config = require('nconf').get()
+const settings = require('nconf').get('app')
 const Utils = require('../helpers/utils')
 
 function notFound (id) {
@@ -31,7 +31,7 @@ function getMediaCount (stateFilter) {
 }
 
 function getSettings (req, res) {
-  res.json(config)
+  res.json(settings)
 }
 
 function getCount (req, res) {
@@ -111,7 +111,7 @@ function postMedia (req, res) {
   if (filename === undefined) { res.send(emptyField('filename')) }
 
   var relativePath = path.join(Utils.dateDir(), filename)
-  var absolutePath = path.join(config.dataFolder, relativePath)
+  var absolutePath = path.join(settings.dataFolder, relativePath)
   mh.toBase64(media).then(data => {
     fs.writeFileSync(absolutePath, data, 'base64')
     Utils.createMedia({
@@ -166,7 +166,7 @@ function deleteMedia (req, res) {
   var id = req.params.id
   Utils.deleteMedia(id)
   .then(media => {
-    fs.unlinkSync(path.join(config.dataFolder, media.path))
+    fs.unlinkSync(path.join(settings.dataFolder, media.path))
     res.send(media)
   })
   .catch(error => {
@@ -178,9 +178,9 @@ function deleteMedia (req, res) {
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
     let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
-    let mediaAbsolutePath = path.join(config.dataFolder, mediaRelativePath)
+    let mediaAbsolutePath = path.join(settings.dataFolder, mediaRelativePath)
     let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
-    let thumbnailAbsolutePath = path.join(config.dataFolder, thumbnailRelativePath)
+    let thumbnailAbsolutePath = path.join(settings.dataFolder, thumbnailRelativePath)
 
     if (mh.isFile(msg.path)) {
       winston.info('Copying new media to ' + path.dirname(mediaAbsolutePath))
@@ -210,7 +210,7 @@ Utils.spacebroClient.on('new-media', function (data) {
   toDataFolder(data)
   .then(paths => {
     data.details.thumbnail.path = paths.thumbnail
-    data.details.thumbnail.source = config.baseURL + 'static/' + paths.thumbnail
+    data.details.thumbnail.source = settings.baseURL + 'static/' + paths.thumbnail
     Utils.createMedia({
       path: paths.media,
       meta: data.meta,

@@ -3,36 +3,37 @@
 const Media = require('../models/media')
 const mh = require('media-helper')
 const winston = require('winston')
-const config = require('nconf').get()
+const settings = require('nconf').get('app')
+const spacebro = require('nconf').get('external:spacebro')
 const path = require('path')
 const spacebroClient = require('spacebro-client')
 const fs = require('fs-extra')
 const moment = require('moment')
 
-spacebroClient.connect(config.spacebro.address, config.spacebro.port, {
-  clientName: config.spacebro.clientName,
-  channelName: config.spacebro.channelName,
+spacebroClient.connect(spacebro.host, spacebro.port, {
+  clientName: spacebro.clientName,
+  channelName: spacebro.channelName,
   verbose: false
 })
 
 function dateDir () {
   var today = moment().format('YYYY-MMMM-DD')
-  fs.ensureDirSync(path.join(config.dataFolder, today))
+  fs.ensureDirSync(path.join(settings.dataFolder, today))
   return (today)
 }
 
 function createMedia (options) {
   return new Promise((resolve, reject) => {
     var newMedia = new Media()
-    var absolutePath = path.join(config.dataFolder, options.path)
+    var absolutePath = path.join(settings.dataFolder, options.path)
     mh.getMimeType(absolutePath).then(type => {
       newMedia.meta = options.meta
       newMedia.bucketId = options.bucketId
       newMedia.uploadedAt = new Date().toISOString()
-      newMedia.state = config.defaultState
+      newMedia.state = settings.defaultState
       newMedia.type = type
       newMedia.path = options.path
-      newMedia.source = config.baseURL + 'static/' + options.path
+      newMedia.source = settings.baseURL + 'static/' + options.path
       newMedia.file = path.basename(options.path)
       newMedia.details = options.details
       newMedia.save(err => {
@@ -62,7 +63,7 @@ function checkIntegrity () {
   Media.find().exec((err, medias) => {
     if (err) { return winston.error(err) } else {
       medias.forEach(media => {
-        var mediaPath = path.join(config.dataFolder, media.path)
+        var mediaPath = path.join(settings.dataFolder, media.path)
         if (mh.isFile(mediaPath) === false) {
           Media.findByIdAndRemove(media._id, function (err, media) {
             if (err) { return console.log(err) } else {

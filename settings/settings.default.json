@@ -1,11 +1,19 @@
 {
-  "spacebro": {
-    "address": "localhost",
-    "port": 8888,
-    "clientName": "media-manager",
-    "channelName": "media-stream"
+  "external": {
+    "spacebro": {
+      "host": "localhost",
+      "port": 8888,
+      "client": "media-manager",
+      "channel": "media-stream"
+    }
   },
-  "dataFolder": "/tmp/media-manager",
-  "defaultState": "public",
-  "states": ["public", "private", "draft"]
+  "app": {
+    "server": {
+      "host": "localhost",
+      "port": 8008
+    },
+    "dataFolder": "/Users/mina/Desktop/mm-data",
+    "defaultState": "public",
+    "states": ["public", "private", "draft"]
+  }
 }
