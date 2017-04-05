@@ -1,5 +1,5 @@
 {
-  "name": "media-moderator",
+  "name": "media-manager",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/soixantecircuits/media-moderator.git"
+    "url": "git+https://github.com/soixantecircuits/media-manager.git"
   },
-  "author": "4quet",
-  "license": "ISC",
+  "author": "Soixante circuits",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/soixantecircuits/media-moderator/issues"
+    "url": "https://github.com/soixantecircuits/media-manager/issues"
   },
-  "homepage": "https://github.com/soixantecircuits/media-moderator#readme",
+  "homepage": "https://github.com/soixantecircuits/media-manager#readme",
   "dependencies": {
     "body-parser": "^1.15.2",
     "chokidar": "^1.6.1",
@@ -33,7 +33,7 @@
     "nconf": "^0.8.4",
     "path": "^0.12.7",
     "spacebro-client": "^0.2.1",
-    "standard-settings": "^1.0.1",
+    "standard-settings": "^1.1.0",
     "winston": "^2.3.1"
   },
   "devDependencies": {
