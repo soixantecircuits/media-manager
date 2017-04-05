@@ -1,12 +1,13 @@
 'use strict'
 
-const settings = require('./settings/lib/settings.js')
+const settings = require('standard-settings')()
+const nconf = require('nconf')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const express = require('express')
 const cors = require('cors')
 const app = express()
-const server = settings.app.server
+const server = settings.server
 const port = process.env.PORT || server.port
 
 const fs = require('fs-extra')
@@ -28,7 +29,7 @@ db.once('open', function () {
 })
 
 app.use(cors())
-app.use('/static', express.static(settings.app.dataFolder))
+app.use('/static', express.static(settings.folder.data))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -41,10 +42,12 @@ app.get('/', function (req, res) {
 })
 
 app.listen(port, server.host, function () {
-  winston.info('host:', ip.address())
+  let ipAddress = ip.address()
+  winston.info('host:', ipAddress)
   winston.info('port:', port)
-  fs.ensureDirSync(settings.app.dataFolder)
-  if (settings.app.cleanOption === true) {
+  nconf.set('baseURL', 'http://' + ipAddress + ':' + port + '/')
+  fs.ensureDirSync(settings.folder.data)
+  if (settings.clean === true) {
     Utils.checkIntegrity()
   }
 })

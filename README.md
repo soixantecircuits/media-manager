@@ -22,28 +22,39 @@ To run **media-manager** you need:
 By default, **media-manager** loads `settings/settings.default.json`:
 ```json
 {
-  "spacebro": {
-    "address": "localhost",
-    "port": 8888,
-    "clientName": "media-manager",
-    "channelName": "media-stream"
+  "server": {
+      "host" : "localhost",
+      "port" : 8008
   },
-  "dataFolder": "/home/mina/Desktop/media-manager-data",
+  "folder": {
+    "data": "/tmp/media-manager"
+  },
   "defaultState": "public",
-  "states": ["public", "private", "draft"]
+  "states": ["public", "private", "draft"],
+  "service": {
+    "spacebro": {
+      "host" : "localhost",
+      "port" : 8888,
+      "channel": "media-stream",
+      "client" : "media-manager",
+      "inputMessage": "new-media",
+      "outputMessage": "media-to-db"
+    }
+  }
 }
 ```
 You can modify this file or load a custom one by adding the `--settings` option.  
 Example: `yarn start -- -settings settings/settings.custom.json`
 
 `spacebro` describes the spacebro client configuration. See [spacebro](https://github.com/spacebro/spacebro) and [spacebro-client](https://github.com/spacebro/spacebro-client).
-`dataFolder` is the directory where all files will be copied.  
+`folder.data` is the directory where all files will be copied.  
 `defaultState` is the state in which a media is at its creation.  
 `states` is an array of all possible states.  
 
 ### Options
 
-`--clean` short `-c`: if a file associated to a media in database cannot be found, it is deleted.  
+`--settings`: load a specific settings file (JSON).  
+`--clean`: if a file associated to a media in database cannot be found, it is deleted.  
 
 ### Documentation
 

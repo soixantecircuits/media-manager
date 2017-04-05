@@ -1,19 +1,21 @@
 {
-  "external": {
-    "spacebro": {
-      "host": "localhost",
-      "port": 8888,
-      "client": "media-manager",
-      "channel": "media-stream"
-    }
+  "server": {
+      "host" : "localhost",
+      "port" : 8008
   },
-  "app": {
-    "server": {
-      "host": "localhost",
-      "port": 8008
-    },
-    "dataFolder": "/tmp/media-manager",
-    "defaultState": "public",
-    "states": ["public", "private", "draft"]
+  "folder": {
+    "data": "/tmp/media-manager"
+  },
+  "defaultState": "public",
+  "states": ["public", "private", "draft"],
+  "service": {
+    "spacebro": {
+      "host" : "localhost",
+      "port" : 8888,
+      "channel": "media-stream",
+      "client" : "media-manager",
+      "inputMessage": "new-media",
+      "outputMessage": "media-to-db"
+    }
   }
 }

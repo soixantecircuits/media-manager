@@ -3,8 +3,8 @@
 const Media = require('../models/media')
 const mh = require('media-helper')
 const winston = require('winston')
-const settings = require('nconf').get('app')
-const spacebro = require('nconf').get('external:spacebro')
+const settings = require('nconf').get()
+const spacebro = require('nconf').get('service:spacebro')
 const path = require('path')
 const spacebroClient = require('spacebro-client')
 const fs = require('fs-extra')
@@ -18,14 +18,14 @@ spacebroClient.connect(spacebro.host, spacebro.port, {
 
 function dateDir () {
   var today = moment().format('YYYY-MMMM-DD')
-  fs.ensureDirSync(path.join(settings.dataFolder, today))
+  fs.ensureDirSync(path.join(settings.folder.data, today))
   return (today)
 }
 
 function createMedia (options) {
   return new Promise((resolve, reject) => {
     var newMedia = new Media()
-    var absolutePath = path.join(settings.dataFolder, options.path)
+    var absolutePath = path.join(settings.folder.data, options.path)
     mh.getMimeType(absolutePath).then(type => {
       newMedia.meta = options.meta
       newMedia.bucketId = options.bucketId
@@ -63,7 +63,7 @@ function checkIntegrity () {
   Media.find().exec((err, medias) => {
     if (err) { return winston.error(err) } else {
       medias.forEach(media => {
-        var mediaPath = path.join(settings.dataFolder, media.path)
+        var mediaPath = path.join(settings.folder.data, media.path)
         if (mh.isFile(mediaPath) === false) {
           Media.findByIdAndRemove(media._id, function (err, media) {
             if (err) { return console.log(err) } else {

@@ -6,7 +6,7 @@ const download = require('download')
 const mh = require('media-helper')
 const winston = require('winston')
 const Media = require('../models/media')
-const settings = require('nconf').get('app')
+const settings = require('nconf').get()
 const Utils = require('../helpers/utils')
 
 function notFound (id) {
@@ -111,7 +111,7 @@ function postMedia (req, res) {
   if (filename === undefined) { res.send(emptyField('filename')) }
 
   var relativePath = path.join(Utils.dateDir(), filename)
-  var absolutePath = path.join(settings.dataFolder, relativePath)
+  var absolutePath = path.join(settings.folder.data, relativePath)
   mh.toBase64(media).then(data => {
     fs.writeFileSync(absolutePath, data, 'base64')
     Utils.createMedia({
@@ -166,7 +166,7 @@ function deleteMedia (req, res) {
   var id = req.params.id
   Utils.deleteMedia(id)
   .then(media => {
-    fs.unlinkSync(path.join(settings.dataFolder, media.path))
+    fs.unlinkSync(path.join(settings.folder.data, media.path))
     res.send(media)
   })
   .catch(error => {
@@ -178,9 +178,9 @@ function deleteMedia (req, res) {
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
     let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
-    let mediaAbsolutePath = path.join(settings.dataFolder, mediaRelativePath)
+    let mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
-    let thumbnailAbsolutePath = path.join(settings.dataFolder, thumbnailRelativePath)
+    let thumbnailAbsolutePath = path.join(settings.folder.data, thumbnailRelativePath)
 
     if (mh.isFile(msg.path)) {
       winston.info('Copying new media to ' + path.dirname(mediaAbsolutePath))
