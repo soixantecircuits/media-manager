@@ -11,8 +11,8 @@ const fs = require('fs-extra')
 const moment = require('moment')
 
 spacebroClient.connect(spacebro.host, spacebro.port, {
-  clientName: spacebro.clientName,
-  channelName: spacebro.channelName,
+  clientName: spacebro.client,
+  channelName: spacebro.channel,
   verbose: false
 })
 
