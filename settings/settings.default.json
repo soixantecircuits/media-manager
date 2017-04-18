@@ -1,0 +1,21 @@
+{
+  "server": {
+      "host" : "localhost",
+      "port" : 8008
+  },
+  "folder": {
+    "data": "/tmp/media-manager"
+  },
+  "defaultState": "public",
+  "states": ["public", "private", "draft"],
+  "service": {
+    "spacebro": {
+      "host" : "localhost",
+      "port" : 8888,
+      "channel": "media-stream",
+      "client" : "media-manager",
+      "inputMessage": "new-media",
+      "outputMessage": "media-to-db"
+    }
+  }
+}
