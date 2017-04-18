@@ -67,6 +67,9 @@ Example:
   "type": "image/gif",
   "state": "public",
   "uploadedAt": "2017-03-15T09:42:00.135Z",
+  "meta": {
+    "foo": "bar"
+  },
   "__v": 0
 }
 ```
@@ -89,6 +92,15 @@ Example: `GET /api/v1/medias/58c90c689882891f79b79066/path`
 #### PUT `api/v1/medias/:id`
 Use this route to modify `state` and/or `bucketId` fields of a media.  
 Example: `PUT api/v1/medias/:id/?state=private&bucketId=098765`  
+
+#### PUT `api/v1/medias/:id/meta`
+Use this route to modify the `meta` object of a media.  
+Example:
+```json
+  {
+    "foo": "bar"
+  }
+```
 
 ## Deleting a media
 

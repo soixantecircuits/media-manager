@@ -152,11 +152,36 @@ function updateMedia (req, res) {
             winston.error(err)
             res.send(err)
           } else {
-            winston.info('UPDATE -', media._id)
+            winston.info('UPDATE -', media._id.toString())
             Utils.spacebroClient.emit('media-updated', spacebroData)
           }
         })
       }
+      res.json(media)
+    }
+  })
+}
+
+function updateMeta (req, res) {
+  Media.findById(req.params.id, (err, media) => {
+    if (err) {
+      winston.error(err)
+      res.send(err)
+    } else if (!media) {
+      res.send(notFound(req.params.id))
+    } else {
+      const meta = Object.assign({}, media.meta, req.body)
+      media.meta = meta
+      media.updatedAt = new Date().toISOString()
+      media.save(err => {
+        if (err) {
+          winston.error(err)
+          res.send(err)
+        } else {
+          winston.info('UPDATE META -', media._id.toString())
+          Utils.spacebroClient.emit('media-updated', meta)
+        }
+      })
       res.json(media)
     }
   })
@@ -231,5 +256,6 @@ module.exports = {
   getField,
   postMedia,
   updateMedia,
+  updateMeta,
   deleteMedia
 }

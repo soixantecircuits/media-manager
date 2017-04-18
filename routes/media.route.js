@@ -18,6 +18,7 @@ router.post('/', controller.postMedia)
 
 // --- PUT --- //
 router.put('/:id', controller.updateMedia)
+router.put('/:id/meta', controller.updateMeta)
 
 // --- DELETE --- //
 router.delete('/:id', controller.deleteMedia)
