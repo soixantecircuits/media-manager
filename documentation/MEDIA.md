@@ -20,6 +20,8 @@ Example:
   }
 ```
 
+A spacebro event `media-to-db` will be emitted.
+
 #### spacebro
 **media-manager** awaits for `new-media` events.  
 Example:
@@ -90,7 +92,11 @@ Example: `GET /api/v1/medias/58c90c689882891f79b79066/path`
 Use this route to modify `state` and/or `bucketId` fields of a media.  
 Example: `PUT api/v1/medias/:id/?state=private&bucketId=098765`  
 
+A spacebro event `media-updated` will be emitted.
+
 ## Deleting a media
 
 #### DELETE `api/v1/medias/:id`
 This route deletes the media instance from database and its associated file.
+
+A spacebro event `media-deleted` will be emitted.
