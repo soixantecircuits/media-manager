@@ -77,10 +77,7 @@ Example:
 ```
 
 #### GET `api/v1/medias/:id/export`
-Returns the media's raw data, image or video.  
-
-#### GET `api/v1/medias/count`
-Returns the total amount of media in the database.  
+Returns the media's raw data, image or video.    
 
 #### GET `api/v1/medias/:id/:field`
 Returns the specified field from the media's json.  
@@ -110,3 +107,14 @@ A spacebro event `media-updated` will be emitted.
 #### DELETE `api/v1/medias/:id`
 This route deletes the media instance from database and its associated file.  
 A spacebro event `media-deleted` will be emitted.
+
+## Misc
+
+#### GET `api/v1/medias`
+Returns a json object describing the full set of media.
+
+#### GET `api/v1/medias/count`
+Returns the total amount of media in the database.
+
+#### GET `api/v1/medias/settings`
+Returns the settings object used by **media-manager**.

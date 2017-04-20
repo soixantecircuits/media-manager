@@ -1,6 +1,6 @@
 # media-manager
 
-### Dependencies
+### 📦 Dependencies
 
 * [MongoDB](https://docs.mongodb.com/manual/)
 * [express](https://expressjs.com)
@@ -10,14 +10,14 @@ To run **media-manager** you need:
 - a **spacebro** server
 - a **Mongo** database
 
-### Installation
+### 🌍 Installation
 
 `git clone https://github.com/soixantecircuits/media-manager.git`  
 `cd media-manager`  
 `yarn`  
 `yarn start`  
 
-### Settings
+### ⚙ Settings
 
 By default, **media-manager** loads `settings/settings.default.json`:
 ```json
@@ -51,11 +51,11 @@ Example: `yarn start -- -settings settings/settings.custom.json`
 `defaultState` is the state in which a media is at its creation.  
 `states` is an array of all possible states.  
 
-### Options
+### 💬 Options
 
 `--settings`: load a specific settings file (JSON).  
 `--clean`: if a file associated to a media in database cannot be found, it is deleted.  
 
-### Documentation
+### 📖 Documentation
 
 [Media](/documentation/MEDIA.md)
