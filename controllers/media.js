@@ -202,22 +202,27 @@ function deleteMedia (req, res) {
 
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
-    let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
+    let msgFile = msg.file || msg.path.split("/").slice(-1)[0]
+    let mediaRelativePath = path.join(Utils.dateDir(), msgFile)
     let mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
-    let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
+    let thumbnailFile = (msg.details && msg.details.thumbnail.file) || msgFile
+    let thumbnailRelativePath = path.join(Utils.dateDir(), thumbnailFile)
     let thumbnailAbsolutePath = path.join(settings.folder.data, thumbnailRelativePath)
+    let thumbnailSource = (msg.details && msg.details.thumbnail.source) || msg.path
 
     if (mh.isFile(msg.path)) {
-      winston.info('Copying new media to ' + path.dirname(mediaAbsolutePath))
+      winston.info('Copying new media to ' +
+        path.dirname(mediaAbsolutePath) + ' folder')
       fs.copySync(msg.path, mediaAbsolutePath)
-      fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
+      fs.copySync(thumbnailSource, thumbnailAbsolutePath)
       return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
     } else if (mh.isURL(msg.path)) {
-      winston.info('Downloading new media to ' + path.dirname(mediaAbsolutePath))
+      winston.info('Downloading new media to ' +
+        path.dirname(mediaAbsolutePath) + ' folder')
       download(msg.path)
       .then(data => {
         fs.writeFileSync(mediaAbsolutePath, data)
-        download(msg.details.thumbnail.source)
+        download(thumbnailSource)
         .then(data => {
           fs.writeFileSync(thumbnailAbsolutePath, data)
           return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
@@ -234,6 +239,7 @@ Utils.spacebroClient.on('new-media', function (data) {
   winston.info('EVENT - "new-media" received')
   toDataFolder(data)
   .then(paths => {
+    data.details = data.details || { thumbnail: {} }
     data.details.thumbnail.path = paths.thumbnail
     data.details.thumbnail.source = settings.baseURL + 'static/' + paths.thumbnail
     Utils.createMedia({
