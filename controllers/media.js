@@ -238,8 +238,8 @@ Utils.spacebroClient.on('new-media', function (data) {
     data.details.thumbnail.source = settings.baseURL + 'static/' + paths.thumbnail
     Utils.createMedia({
       path: paths.media,
-      meta: data.meta,
-      details: data.details
+      meta: data.meta || {},
+      details: data.details || {}
     })
     .then(media => winston.info('ADD -', media._id, '-', media.path))
     .catch(error => winston.error(error))
