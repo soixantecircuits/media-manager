@@ -202,26 +202,34 @@ function deleteMedia (req, res) {
 
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
+    msg.file = msg.file || path.basename(msg.path) 
     let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
     let mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
-    let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
-    let thumbnailAbsolutePath = path.join(settings.folder.data, thumbnailRelativePath)
+    if (msg.details && msg.details.thumbnail) {
+      let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
+      let thumbnailAbsolutePath = path.join(settings.folder.data, thumbnailRelativePath)
+    }
 
     if (mh.isFile(msg.path)) {
       winston.info('Copying new media to ' + path.dirname(mediaAbsolutePath))
       fs.copySync(msg.path, mediaAbsolutePath)
-      fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
-      return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
+      if (msg.details && msg.details.thumbnail) {
+        fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
+        return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
+      }
+      return resolve({ media: mediaRelativePath })
     } else if (mh.isURL(msg.path)) {
       winston.info('Downloading new media to ' + path.dirname(mediaAbsolutePath))
       download(msg.path)
       .then(data => {
         fs.writeFileSync(mediaAbsolutePath, data)
-        download(msg.details.thumbnail.source)
-        .then(data => {
-          fs.writeFileSync(thumbnailAbsolutePath, data)
-          return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
-        }).catch(err => reject(err))
+        if (msg.details && msg.details.thumbnail) {
+          download(msg.details.thumbnail.source)
+          .then(data => {
+            fs.writeFileSync(thumbnailAbsolutePath, data)
+            return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
+          }).catch(err => reject(err))
+        }
       }).catch(err => reject(err))
     } else {
       reject(new Error(`Error: ${msg.path} is not a file or an URL`))
@@ -234,8 +242,10 @@ Utils.spacebroClient.on('new-media', function (data) {
   winston.info('EVENT - "new-media" received')
   toDataFolder(data)
   .then(paths => {
-    data.details.thumbnail.path = paths.thumbnail
-    data.details.thumbnail.source = settings.baseURL + 'static/' + paths.thumbnail
+    if (data.details && data.details.thumbnail) {
+      data.details.thumbnail.path = paths.thumbnail
+      data.details.thumbnail.source = settings.baseURL + 'static/' + paths.thumbnail
+    }
     Utils.createMedia({
       path: paths.media,
       meta: data.meta,
