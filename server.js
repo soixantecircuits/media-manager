@@ -48,7 +48,7 @@ app.get('/', function (req, res) {
   res.json({ service: 'media-manager', status: 'running', settings: settings })
 })
 
-app.listen(port, server.host, function () {
+app.listen(port, function () {
   winston.info('host:', ip.address())
   winston.info('port:', port)
   fs.ensureDirSync(settings.folder.data)
