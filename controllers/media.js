@@ -206,15 +206,16 @@ function toDataFolder (msg) {
     let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
     let mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     if (msg.details && msg.details.thumbnail) {
-      let thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
-      let thumbnailAbsolutePath = path.join(settings.folder.data, thumbnailRelativePath)
+      msg.details.thumbnail.file = msg.details.thumbnail.file || path.basename(msg.details.thumbnail.path)
+      var thumbnailRelativePath = path.join(Utils.dateDir(), msg.details.thumbnail.file)
+      var thumbnailAbsolutePath = path.join(settings.folder.data, thumbnailRelativePath)
     }
 
     if (mh.isFile(msg.path)) {
       winston.info('Copying new media to ' + path.dirname(mediaAbsolutePath))
       fs.copySync(msg.path, mediaAbsolutePath)
       if (msg.details && msg.details.thumbnail) {
-        fs.copySync(msg.details.thumbnail.source, thumbnailAbsolutePath)
+        fs.copySync(msg.details.thumbnail.path, thumbnailAbsolutePath)
         return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
       }
       return resolve({ media: mediaRelativePath })
@@ -224,7 +225,8 @@ function toDataFolder (msg) {
       .then(data => {
         fs.writeFileSync(mediaAbsolutePath, data)
         if (msg.details && msg.details.thumbnail) {
-          download(msg.details.thumbnail.source)
+          var thumbnailSource = msg.details.thumbnail.url || msg.details.thumbnail.source
+          download(thumbnailSource)
           .then(data => {
             fs.writeFileSync(thumbnailAbsolutePath, data)
             return resolve({ media: mediaRelativePath, thumbnail: thumbnailRelativePath })
