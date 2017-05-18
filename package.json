@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/soixantecircuits/media-manager#readme",
   "dependencies": {
+    "async": "^2.4.0",
     "body-parser": "^1.15.2",
     "chokidar": "^1.6.1",
     "commander": "^2.9.0",

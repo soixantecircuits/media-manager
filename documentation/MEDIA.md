@@ -14,6 +14,17 @@ Example:
     "media": "base64 string / path to a file / url",
     "filename": "myNewMedia.jpg",
     "bucketId" : "5678",
+    "details": {
+      "width": 600,
+      "height": 400,
+      "icon": {
+        "file": "icon.jpg",
+        "width": 64,
+        "height": 64,
+        "type": "image/jpg",
+        "path": "path to a file / url"
+      }
+    },
     "meta": {
       "foo": "bar"
     }
@@ -23,7 +34,7 @@ Example:
 A spacebro event `media-to-db` will be emitted.
 
 #### spacebro
-**media-manager** awaits for `new-media` events.  
+**media-manager** awaits for `new-media` events.
 Example:
 ```json
   {
@@ -38,11 +49,17 @@ Example:
         "width": 128,
         "height": 128,
         "type": "image/jpg",
-        "source": "path to a file / url"
+        "path": "path to a file / url"
       }
+    },
+    "meta": {
+      "put": "whatever",
+      "you": "want"
     }
   }
 ```
+
+The `details` and `meta` object are copied, and **media-manager** will try to import files in the `details` object if it finds a path or url (ex: if `details.thumbnail.path` is defined and valid).
 
 ## Accessing a media
 
@@ -60,12 +77,13 @@ Example:
       "width": 128,
       "height": 128,
       "type": "image/jpg",
-      "source": "http://media-manager.url/route/to/thumb"
+      "path": "/path/to/thumb.jpg",
+      "url": "http://media-manager.url/route/to/thumb"
     }
   },
   "file": "media.gif",
   "path": "path/to/media.gif",
-  "source": "http://media-manager.url/route/to/media",
+  "url": "http://media-manager.url/route/to/media",
   "type": "image/gif",
   "state": "public",
   "uploadedAt": "2017-03-15T09:42:00.135Z",
