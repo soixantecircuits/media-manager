@@ -203,8 +203,8 @@ function deleteMedia (req, res) {
 
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
-    let msgFile = msg.file || msg.path.split('/').slice(-1)[0]
-    let mediaRelativePath = path.join(Utils.dateDir(), msgFile)
+    msg.file = msg.file || path.basename(msg.path)
+    let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
     let mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
 
     var res = {
@@ -230,13 +230,14 @@ function toDataFolder (msg) {
           }
         }).catch(err => reject(err))
     } else {
-      return reject(new Error(`Error: Could not find a path or URL to the file ${msgFile}.`))
+      return reject(new Error(`Error: Could not find a path or URL to the file ${msg.file}.`))
     }
 
     // Check for files to import from media details and copy them to the disk
     async.eachOf(msg.details, function (mediaVersion, key, callback) {
       if (typeof mediaVersion === 'object' && (mediaVersion.path || mediaVersion.url)) {
-        let versionFile = mediaVersion.file || mediaVersion.path.split('/').slice(-1)[0] || mediaVersion.url.split('/').slice(-1)[0]
+        mediaVersion.file = mediaVersion.file || path.basename(mediaVersion.path)
+        let versionFile = mediaVersion.file || mediaVersion.url.split('/').slice(-1)[0]
         let versionRelativePath = path.join(Utils.dateDir(), versionFile)
         let versionAbsolutePath = path.join(settings.folder.data, versionRelativePath)
 

@@ -43,7 +43,8 @@ By default, **media-manager** loads `settings/settings.default.json`:
   }
 }
 ```
-You can modify this file or load a custom one by adding the `--settings` option.  
+You can copy this file to `settings/settings.json`, edit it, and it will be automatically loaded.
+Or load a custom one by adding the `--settings` option.  
 Example: `yarn start -- -settings settings/settings.custom.json`
 
 `spacebro` describes the spacebro client configuration. See [spacebro](https://github.com/spacebro/spacebro) and [spacebro-client](https://github.com/spacebro/spacebro-client).
