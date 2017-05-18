@@ -30,10 +30,11 @@ function createMedia (options) {
       newMedia.meta = options.meta
       newMedia.bucketId = options.bucketId
       newMedia.uploadedAt = new Date().toISOString()
+      newMedia.updatedAt = new Date().toISOString()
       newMedia.state = settings.defaultState
       newMedia.type = type
       newMedia.path = options.path
-      newMedia.source = settings.baseURL + 'static/' + options.path
+      newMedia.url = settings.baseURL + 'static/' + options.path
       newMedia.file = path.basename(options.path)
       newMedia.details = options.details
       newMedia.save(err => {
