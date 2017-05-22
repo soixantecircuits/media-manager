@@ -49,7 +49,7 @@ app.get('/', function (req, res) {
 })
 
 app.listen(port, function () {
-  winston.info('host:', ip.address())
+  winston.info('host:', server.host)
   winston.info('port:', port)
   fs.ensureDirSync(settings.folder.data)
   if (settings.clean === true) {
