@@ -22,21 +22,16 @@ function dateDir () {
   return (today)
 }
 
-function createMedia (options) {
+function createMedia (data) {
   return new Promise((resolve, reject) => {
-    var newMedia = new Media()
-    var absolutePath = path.join(settings.folder.data, options.path)
+    var absolutePath = data.path
     mh.getMimeType(absolutePath).then(type => {
-      newMedia.meta = options.meta
-      newMedia.bucketId = options.bucketId
-      newMedia.uploadedAt = new Date().toISOString()
-      newMedia.updatedAt = new Date().toISOString()
-      newMedia.state = settings.defaultState
-      newMedia.type = type
-      newMedia.path = options.path
-      newMedia.url = settings.baseURL + 'static/' + options.path
-      newMedia.file = path.basename(options.path)
-      newMedia.details = options.details
+      data.uploadedAt = new Date().toISOString()
+      data.updatedAt = new Date().toISOString()
+      data.state = settings.defaultState
+      data.type = type
+      data.file = path.basename(data.path)
+      var newMedia = new Media(data)
       newMedia.save(err => {
         if (err) { winston.error(err) } else {
           spacebroClient.emit('media-to-db', newMedia)

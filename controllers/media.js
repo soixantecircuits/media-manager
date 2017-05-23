@@ -201,75 +201,64 @@ function deleteMedia (req, res) {
     })
 }
 
-function toDataFolder (msg) {
+function copyOrDownload (msg) {
   return new Promise((resolve, reject) => {
     msg.file = msg.file || path.basename(msg.path)
-    let mediaRelativePath = path.join(Utils.dateDir(), msg.file)
-    let mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
-
-    var res = {
-      media: mediaRelativePath
-    }
-
+    var mediaRelativePath = path.join(Utils.dateDir(), msg.file)
+    var mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     // Copy the media to the disk
     if (mh.isFile(msg.path)) {
-      winston.info('Copying new media to ' + path.dirname(mediaAbsolutePath) + ' folder')
+      winston.info('Copying file ' + msg.file + ' to ' + mediaRelativePath)
       try {
         fs.copySync(msg.path, mediaAbsolutePath)
+        msg.path = mediaAbsolutePath
+        msg.url = settings.baseURL + 'static/' + mediaRelativePath
+        winston.info('Done copying file ' + msg.file + ' to ' + mediaRelativePath)
+        resolve(msg)
       } catch (err) {
-        return reject(err)
+        reject(err)
       }
     } else if (mh.isURL(msg.path) || mh.isURL(msg.url)) {
-      winston.info('Downloading new media to ' + path.dirname(mediaAbsolutePath) + ' folder')
+      winston.info('Downloading file ' + msg.file + ' to ' + mediaRelativePath)
       download(mh.isURL(msg.path) ? msg.path : msg.url)
         .then(data => {
           try {
             fs.writeFileSync(mediaAbsolutePath, data)
+            msg.path = mediaAbsolutePath
+            msg.url = settings.baseURL + 'static/' + mediaRelativePath
+            winston.info('Done downloading file ' + msg.file + ' to ' + mediaRelativePath)
+            resolve(msg)
           } catch (err) {
-            return reject(err)
+            reject(err)
           }
         }).catch(err => reject(err))
     } else {
-      return reject(new Error(`Error: Could not find a path or URL to the file ${msg.file}.`))
+      reject(new Error(`Error: Could not find a path or URL to the file ${msg.file}.`))
     }
+  })
+}
+
+function toDataFolder (msg) {
+  return new Promise((resolve, reject) => {
+
+    copyOrDownload(msg) 
+      .catch(err => reject(err))
 
     // Check for files to import from media details and copy them to the disk
     async.eachOf(msg.details, function (mediaVersion, key, callback) {
       if (typeof mediaVersion === 'object' && (mediaVersion.path || mediaVersion.url)) {
-        mediaVersion.file = mediaVersion.file || path.basename(mediaVersion.path)
-        let versionFile = mediaVersion.file || mediaVersion.url.split('/').slice(-1)[0]
-        let versionRelativePath = path.join(Utils.dateDir(), versionFile)
-        let versionAbsolutePath = path.join(settings.folder.data, versionRelativePath)
-
-        if (mh.isFile(mediaVersion.path)) {
-          try {
-            fs.copySync(mediaVersion.path, versionAbsolutePath)
-          } catch (err) {
-            return callback(err)
-          }
-          res[key] = versionRelativePath
-          return callback()
-        } else if (mh.isURL(mediaVersion.path) || mh.isURL(mediaVersion.url)) {
-          download(mh.isURL(mediaVersion.path) ? mediaVersion.path : mediaVersion.url)
-            .then(data => {
-              try {
-                fs.writeFileSync(versionAbsolutePath, data)
-              } catch (err) {
-                return callback(err)
-              }
-              res[key] = versionRelativePath
-              return callback()
-            })
-            .catch(err => callback(err))
-        } else {
-          return callback()
-        }
+        copyOrDownload(mediaVersion) 
+        .then(data => callback())
+        .catch(err => callback(err))
+      } else {
+        callback()
       }
     }, (err) => {
       if (err) {
         reject(err)
       } else {
-        resolve(res)
+        winston.info('Done copying/downloading files and details for media ' + msg.file)
+        resolve(msg)
       }
     })
   })
@@ -279,20 +268,8 @@ function toDataFolder (msg) {
 Utils.spacebroClient.on('new-media', function (data) {
   winston.info('EVENT - "new-media" received')
   toDataFolder(data)
-    .then(paths => {
-      data.details = data.details || {}
-      for (let key in paths) {
-        if (key !== 'media') {
-          data.details[key] = data.details[key] || {}
-          data.details[key].path = paths[key]
-          data.details[key].url = settings.baseURL + 'static/' + paths[key]
-        }
-      }
-      Utils.createMedia({
-        path: paths.media,
-        meta: data.meta,
-        details: data.details
-      })
+    .then(data => {
+      Utils.createMedia(data)
         .then(media => winston.info('ADD -', media._id, '-', media.path))
         .catch(error => winston.error(error))
     }).catch(error => winston.error(error))
