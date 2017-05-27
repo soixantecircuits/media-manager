@@ -28,6 +28,34 @@ spacebroClient.on('new-member', (data) => {
   console.log(`spacebro: ${data.member} has joined.`)
 })
 
+spacebroClient.on('media-update', (data) => {
+  console.log(`spacebro: should update ${data._id}`)
+  setMeta(data)
+  spacebroClient.emit('media-updated', data.meta)
+})
+
+function setMeta (media) {
+  Media.findById(media._id, (err, mediaDoc) => {
+    if (err) {
+      winston.error(err)
+    } else if (!mediaDoc) {
+      winston.warn(`media: ${media._id} not found`)
+    } else {
+      Media.update({
+        _id: media._id
+      }, {
+        $set: Object.assign(mediaDoc.toObject(), media)
+      }, (err, doc) => {
+        if (err) {
+          winston.error(err)
+        } else {
+          winston.log(`media - setMeta succeed for ${doc._id}`)
+        }
+      })
+    }
+  })
+}
+
 function dateDir () {
   var today = moment().format('YYYY-MMMM-DD')
   fs.ensureDirSync(path.join(settings.folder.data, today))
