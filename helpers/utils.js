@@ -17,10 +17,10 @@ spacebroClient.connect(spacebro.host, spacebro.port, {
 })
 
 spacebroClient.on('connect', () => {
-  console.log(`spacebro: connected to ${spacebro.host}:${spacebro.port}`)
+  console.log(`spacebro: ${spacebro.client} connected to ${spacebro.host}:${spacebro.port}#${spacebro.channel}`)
 })
 
-spacebroClient.on('deconnect', () => {
+spacebroClient.on('disconnect', () => {
   console.log(`spacebro: disconnected from ${spacebro.host}:${spacebro.port}`)
 })
 
