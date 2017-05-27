@@ -16,6 +16,18 @@ spacebroClient.connect(spacebro.host, spacebro.port, {
   verbose: false
 })
 
+spacebroClient.on('connect', () => {
+  console.log(`spacebro: connected to ${spacebro.host}:${spacebro.port}`)
+})
+
+spacebroClient.on('deconnect', () => {
+  console.log(`spacebro: disconnected from ${spacebro.host}:${spacebro.port}`)
+})
+
+spacebroClient.on('new-member', (data) => {
+  console.log(`spacebro: ${data.member} has joined.`)
+})
+
 function dateDir () {
   var today = moment().format('YYYY-MMMM-DD')
   fs.ensureDirSync(path.join(settings.folder.data, today))
