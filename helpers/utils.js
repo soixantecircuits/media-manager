@@ -3,6 +3,7 @@
 const Media = require('../models/media')
 const mh = require('media-helper')
 const winston = require('winston')
+const assignment = require('assignment')
 const settings = require('nconf').get()
 const spacebro = require('nconf').get('service:spacebro')
 const path = require('path')
@@ -44,7 +45,7 @@ function setMeta (media) {
       Media.update({
         _id: media._id
       }, {
-        $set: Object.assign(mediaDoc.toObject(), media)
+        $set: assignment(mediaDoc.toObject(), media)
       }, (err, doc) => {
         if (err) {
           winston.error(err)
