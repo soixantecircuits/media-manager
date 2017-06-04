@@ -667,9 +667,9 @@ doctrine@^2.0.0:
     esutils "^2.0.2"
     isarray "^1.0.0"
 
-download@^6.2.1:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/download/-/download-6.2.1.tgz#3fc1ed12522215bd2e46e2f5441ece6297afdfc7"
+download@^6.2.2:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/download/-/download-6.2.2.tgz#c0a19bfd81855e1a333f8ff4275f004dea6d85bd"
   dependencies:
     caw "^2.0.0"
     content-disposition "^0.5.2"
@@ -1893,11 +1893,12 @@ map-stream@~0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/map-stream/-/map-stream-0.1.0.tgz#e56aa94c4c8055a16404a0674b78f215f7c8e194"
 
-media-helper@^1.0.1:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/media-helper/-/media-helper-1.0.4.tgz#335d1d19be1cec60763cc91210aed6d030dc748d"
+media-helper@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/media-helper/-/media-helper-1.1.1.tgz#705c58bb605d8ce94a6e781e41eb20427b63814d"
   dependencies:
     file-type "^4.0.0"
+    mime-types "^2.1.15"
     mmmagic "^0.4.5"
     request "^2.79.0"
 
@@ -1935,7 +1936,7 @@ mime-db@~1.27.0:
   version "1.27.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.27.0.tgz#820f572296bbd20ec25ed55e5b5de869e5436eb1"
 
-mime-types@^2.1.12, mime-types@~2.1.11, mime-types@~2.1.15, mime-types@~2.1.7:
+mime-types@^2.1.12, mime-types@^2.1.15, mime-types@~2.1.11, mime-types@~2.1.15, mime-types@~2.1.7:
   version "2.1.15"
   resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.15.tgz#a4ebf5064094569237b8cf70046776d09fc92aed"
   dependencies:
