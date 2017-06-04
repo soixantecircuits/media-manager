@@ -6,6 +6,7 @@ const download = require('download')
 const async = require('async')
 const mh = require('media-helper')
 const winston = require('winston')
+const uuidV4 = require('uuid/v4')
 const Media = require('../models/media')
 const settings = require('nconf').get()
 const Utils = require('../helpers/utils')
@@ -203,8 +204,9 @@ function deleteMedia (req, res) {
 
 function copyOrDownload (msg) {
   return new Promise((resolve, reject) => {
+    console.log('start copyOrDownload process...')
     msg.file = msg.file || path.basename(msg.path)
-    var mediaRelativePath = path.join(Utils.dateDir(), msg.file)
+    var mediaRelativePath = path.join(Utils.dateDir(), msg.file + '-' + uuidV4())
     var mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     // Copy the media to the disk
     if (mh.isFile(msg.path)) {
@@ -232,8 +234,22 @@ function copyOrDownload (msg) {
             reject(err)
           }
         }).catch(err => reject(err))
+    } else if (mh.isBase64(msg.path) || mh.isBase64(msg.url)) {
+      winston.info('Creating file ' + msg.file + ' to ' + mediaRelativePath)
+      try {
+        let base64Data = msg.url.replace(/^data:image\/png;base64,/, '')
+        fs.writeFileSync(mediaAbsolutePath, base64Data, 'base64')
+        msg.path = mediaAbsolutePath
+        msg.url = settings.baseURL + 'static/' + mediaRelativePath
+        winston.info('Done creating file ' + msg.file + ' to ' + mediaRelativePath)
+        resolve(msg)
+      } catch (err) {
+        reject(err)
+      }
     } else {
-      reject(new Error(`Error: Could not find a path or URL to the file ${msg.file}.`))
+      let msgError = `Error: Could not find a path or URL to the file ${msg.file}.`
+      console.error(msgError)
+      reject(new Error(msgError))
     }
   })
 }
@@ -241,7 +257,7 @@ function copyOrDownload (msg) {
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
 
-    copyOrDownload(msg) 
+    copyOrDownload(msg)
       .catch(err => reject(err))
 
     // Check for files to import from media details and copy them to the disk
