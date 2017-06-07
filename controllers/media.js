@@ -207,7 +207,7 @@ function copyOrDownload (msg) {
     console.log('start copyOrDownload process...')
     msg.file = msg.file || path.basename(msg.path)
     var basename = path.basename(msg.file)
-    var mediaRelativePath = path.join(Utils.dateDir(),  basename + path.extname(msg.file)
+    var mediaRelativePath = path.join(Utils.dateDir(),  basename + path.extname(msg.file))
     var mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     // Copy the media to the disk
     if (mh.isFile(msg.path)) {
