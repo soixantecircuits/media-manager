@@ -6,7 +6,7 @@ const download = require('download')
 const async = require('async')
 const mh = require('media-helper')
 const winston = require('winston')
-const uuidV4 = require('uuid/v4')
+//const uuidV4 = require('uuid/v4')
 const Media = require('../models/media')
 const settings = require('nconf').get()
 const Utils = require('../helpers/utils')
@@ -207,7 +207,7 @@ function copyOrDownload (msg) {
     console.log('start copyOrDownload process...')
     msg.file = msg.file || path.basename(msg.path)
     var basename = path.basename(msg.file)
-    var mediaRelativePath = path.join(Utils.dateDir(),  basename + '-' + uuidV4()) + path.extname(msg.file)
+    var mediaRelativePath = path.join(Utils.dateDir(),  basename + path.extname(msg.file)
     var mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     // Copy the media to the disk
     if (mh.isFile(msg.path)) {
