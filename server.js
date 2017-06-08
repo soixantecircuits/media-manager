@@ -11,11 +11,10 @@ const ip = require('ip')
 const winston = require('winston')
 
 // Settings
-const standardSettings = require('standard-settings')
 const nconf = require('nconf')
-const settings = nconf.get()
+const settings = require('standard-settings').getSettings()
 const server = settings.server
-const port = process.env.PORT || server.port
+const port = server.port
 nconf.set('baseURL', 'http://' + server.host + ':' + port + '/')
 
 // Routes

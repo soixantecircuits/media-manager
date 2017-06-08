@@ -1,8 +1,6 @@
 'use strict'
 const spaceBro = require('spacebro-client')
-var nconf = require('nconf')
-require('standard-settings')
-var settings = nconf.get()
+const settings = require('standard-settings').getSettings()
 
 settings.service.spacebro = settings.service.spacebro || {}
 settings.service.spacebro.host = settings.service.spacebro.host || 'spacebro.space'

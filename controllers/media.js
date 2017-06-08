@@ -8,7 +8,7 @@ const mh = require('media-helper')
 const winston = require('winston')
 //const uuidV4 = require('uuid/v4')
 const Media = require('../models/media')
-const settings = require('nconf').get()
+const settings = require('standard-settings').getSettings()
 const Utils = require('../helpers/utils')
 
 function notFound (id) {
@@ -264,7 +264,7 @@ function toDataFolder (msg) {
     // Check for files to import from media details and copy them to the disk
     async.eachOf(msg.details, function (mediaVersion, key, callback) {
       if (typeof mediaVersion === 'object' && (mediaVersion.path || mediaVersion.url)) {
-        copyOrDownload(mediaVersion) 
+        copyOrDownload(mediaVersion)
         .then(data => callback())
         .catch(err => callback(err))
       } else {
