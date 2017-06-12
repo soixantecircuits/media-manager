@@ -3,7 +3,7 @@
 const Media = require('../models/media')
 const winston = require('winston')
 
-//router.get('/', function (req, res) {
+// router.get('/', function (req, res) {
 function getAllMedia (req, res) {
   var state = req.query.state
   var page = Number(req.query.page)
@@ -38,7 +38,7 @@ function getAllMedia (req, res) {
   })
 }
 
-//router.get('/:id', function (req, res) {
+// router.get('/:id', function (req, res) {
 function getMediaData (req, res) {
   var next = req.query.next
   var prev = req.query.prev

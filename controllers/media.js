@@ -257,7 +257,6 @@ function copyOrDownload (msg) {
 
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
-
     copyOrDownload(msg)
       .catch(err => reject(err))
 

@@ -7,7 +7,6 @@ const cors = require('cors')
 const app = express()
 
 const fs = require('fs-extra')
-const ip = require('ip')
 const winston = require('winston')
 
 // Settings
