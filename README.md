@@ -17,6 +17,8 @@ To run **media-manager** you need:
 `yarn`  
 `yarn start`  
 
+Note - you can only run one instance of **media-manager** per computer.
+
 ### ⚙ Settings
 
 By default, **media-manager** loads `settings/settings.default.json`:
