@@ -2,11 +2,11 @@
   "name": "media-manager",
   "version": "1.0.1",
   "description": "",
-  "main": "server.js",
+  "main": "src/app.js",
   "scripts": {
     "test": "./node_modules/.bin/standard",
-    "dev": "./node_modules/.bin/nodemon server.js",
-    "start": "node server.js",
+    "dev": "./node_modules/.bin/nodemon index.js",
+    "start": "node index.js",
     "fix": "./node_modules/.bin/standard --fix",
     "lint": "eslint --ext .js server.js test routes models controllers"
   },

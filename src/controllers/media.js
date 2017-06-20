@@ -6,10 +6,10 @@ const download = require('download')
 const async = require('async')
 const mh = require('media-helper')
 const winston = require('winston')
-//const uuidV4 = require('uuid/v4')
 const Media = require('../models/media')
-const settings = require('standard-settings').getSettings()
+let settings = {}
 const Utils = require('../helpers/utils')
+var controller = {}
 
 function notFound (id) {
   let error = 'Media not found'
@@ -207,7 +207,7 @@ function copyOrDownload (msg) {
     console.log('start copyOrDownload process...')
     msg.file = msg.file || path.basename(msg.path)
     var basename = path.basename(msg.file)
-    var mediaRelativePath = path.join(Utils.dateDir(),  basename + path.extname(msg.file))
+    var mediaRelativePath = path.join(Utils.dateDir(), basename + path.extname(msg.file))
     var mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     // Copy the media to the disk
     if (mh.isFile(msg.path)) {
@@ -215,7 +215,7 @@ function copyOrDownload (msg) {
       try {
         fs.copySync(msg.path, mediaAbsolutePath)
         msg.path = mediaAbsolutePath
-        msg.url = settings.baseURL + 'static/' + mediaRelativePath
+        msg.url = controller.baserURL + 'static/' + mediaRelativePath
         winston.info('Done copying file ' + msg.file + ' to ' + mediaRelativePath)
         resolve(msg)
       } catch (err) {
@@ -228,7 +228,7 @@ function copyOrDownload (msg) {
           try {
             fs.writeFileSync(mediaAbsolutePath, data)
             msg.path = mediaAbsolutePath
-            msg.url = settings.baseURL + 'static/' + mediaRelativePath
+            msg.url = controller.baserURL + 'static/' + mediaRelativePath
             winston.info('Done downloading file ' + msg.file + ' to ' + mediaRelativePath)
             resolve(msg)
           } catch (err) {
@@ -241,7 +241,7 @@ function copyOrDownload (msg) {
         let base64Data = msg.url.replace(/^data:image\/png;base64,/, '')
         fs.writeFileSync(mediaAbsolutePath, base64Data, 'base64')
         msg.path = mediaAbsolutePath
-        msg.url = settings.baseURL + 'static/' + mediaRelativePath
+        msg.url = controller.baserURL + 'static/' + mediaRelativePath
         winston.info('Done creating file ' + msg.file + ' to ' + mediaRelativePath)
         resolve(msg)
       } catch (err) {
@@ -291,7 +291,13 @@ Utils.spacebroClient.on('new-media', function (data) {
     }).catch(error => winston.error(error))
 })
 
-module.exports = {
+let init = (options) => {
+  settings = options
+  controller.baseURL = `http://${settings.server.host}:${settings.server.port}/`
+}
+
+controller = {
+  init,
   getSettings,
   getCount,
   getFirst,
@@ -302,5 +308,8 @@ module.exports = {
   postMedia,
   updateMedia,
   updateMeta,
-  deleteMedia
+  deleteMedia,
+  baseURL: ''
 }
+
+module.exports = controller
