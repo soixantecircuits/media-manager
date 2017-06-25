@@ -39,8 +39,8 @@ function getSettings (req, res) {
 function getCount (req, res) {
   res.contentType('text/plain')
   getMediaCount(req.query.state)
-    .then(count => res.send(count.toString()))
-    .catch(error => res.send(error))
+    .then((count) => res.send(count.toString()))
+    .catch((error) => res.send(error))
 }
 
 function getFirst (req, res) {
@@ -114,20 +114,20 @@ function postMedia (req, res) {
 
   var relativePath = path.join(Utils.dateDir(), filename)
   var absolutePath = path.join(settings.folder.data, relativePath)
-  mh.toBase64(media).then(data => {
+  mh.toBase64(media).then((data) => {
     fs.writeFileSync(absolutePath, data, 'base64')
     Utils.createMedia({
       path: relativePath,
       meta: req.body.meta,
       bucketId: req.body.bucketId
     })
-      .then(media => {
+      .then((media) => {
         winston.info('ADD -', media._id, '-', media.path)
         res.send(media)
       })
-      .catch(error => res.send(error))
+      .catch((error) => res.send(error))
   })
-    .catch(error => res.send(error))
+    .catch((error) => res.send(error))
 }
 
 function updateMedia (req, res) {
@@ -149,7 +149,7 @@ function updateMedia (req, res) {
       }
       if (req.body.state || req.body.bucketId) {
         media.updatedAt = new Date().toISOString()
-        media.save(err => {
+        media.save((err) => {
           if (err) {
             winston.error(err)
             res.send(err)
@@ -175,7 +175,7 @@ function updateMeta (req, res) {
       const meta = Object.assign({}, media.meta, req.body)
       media.meta = meta
       media.updatedAt = new Date().toISOString()
-      media.save(err => {
+      media.save((err) => {
         if (err) {
           winston.error(err)
           res.send(err)
@@ -192,11 +192,11 @@ function updateMeta (req, res) {
 function deleteMedia (req, res) {
   var id = req.params.id
   Utils.deleteMedia(id)
-    .then(media => {
+    .then((media) => {
       fs.unlinkSync(path.join(settings.folder.data, media.path))
       res.send(media)
     })
-    .catch(error => {
+    .catch((error) => {
       winston.error(error)
       res.send(error)
     })
@@ -224,7 +224,7 @@ function copyOrDownload (msg) {
     } else if (mh.isURL(msg.path) || mh.isURL(msg.url)) {
       winston.info('Downloading file ' + msg.file + ' to ' + mediaRelativePath)
       download(mh.isURL(msg.path) ? msg.path : msg.url)
-        .then(data => {
+        .then((data) => {
           try {
             fs.writeFileSync(mediaAbsolutePath, data)
             msg.path = mediaAbsolutePath
@@ -234,7 +234,7 @@ function copyOrDownload (msg) {
           } catch (err) {
             reject(err)
           }
-        }).catch(err => reject(err))
+        }).catch((err) => reject(err))
     } else if (mh.isBase64(msg.path) || mh.isBase64(msg.url)) {
       winston.info('Creating file ' + msg.file + ' to ' + mediaRelativePath)
       try {
@@ -258,14 +258,14 @@ function copyOrDownload (msg) {
 function toDataFolder (msg) {
   return new Promise((resolve, reject) => {
     copyOrDownload(msg)
-      .catch(err => reject(err))
+      .catch((err) => reject(err))
 
     // Check for files to import from media details and copy them to the disk
     async.eachOf(msg.details, function (mediaVersion, key, callback) {
       if (typeof mediaVersion === 'object' && (mediaVersion.path || mediaVersion.url)) {
         copyOrDownload(mediaVersion)
-        .then(data => callback())
-        .catch(err => callback(err))
+        .then((data) => callback())
+        .catch((err) => callback(err))
       } else {
         callback()
       }
@@ -284,11 +284,11 @@ function toDataFolder (msg) {
 Utils.spacebroClient.on('new-media', function (data) {
   winston.info('EVENT - "new-media" received')
   toDataFolder(data)
-    .then(data => {
+    .then((data) => {
       Utils.createMedia(data)
-        .then(media => winston.info('ADD -', media._id, '-', media.path))
-        .catch(error => winston.error(error))
-    }).catch(error => winston.error(error))
+        .then((media) => winston.info('ADD -', media._id, '-', media.path))
+        .catch((error) => winston.error(error))
+    }).catch((error) => winston.error(error))
 })
 
 let init = (options) => {

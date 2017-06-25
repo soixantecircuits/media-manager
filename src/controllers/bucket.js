@@ -21,7 +21,7 @@ Utils.spacebroClient.on('media-updated', function (data) {
         Media.findById(data.mediaId, (err, media) => {
           if (err) { return console.error(errorMsg, err) } else {
             bucket.medias.push(media)
-            bucket.save(err => {
+            bucket.save((err) => {
               if (err) { return console.error(errorMsg, err) } else {
                 console.log('A media has been added to bucket', data.newBucketId)
               }
@@ -41,7 +41,7 @@ Utils.spacebroClient.on('media-deleted', function (data) {
         bucket.medias.forEach((media, index) => {
           if (media._id.toString() === data.mediaId) {
             bucket.medias.splice(index, 1)
-            bucket.save(err => {
+            bucket.save((err) => {
               if (err) { return console.error(errorMsg, err) } else {
                 console.log('A media has been deleted from bucket', data.bucketId)
               }
@@ -63,7 +63,7 @@ function postBucket (req, res) {
     bucket.slug = slugify(name)
     bucket.name = name
     bucket.medias = []
-    bucket.save(err => {
+    bucket.save((err) => {
       if (err) {
         res.send(err)
       } else {

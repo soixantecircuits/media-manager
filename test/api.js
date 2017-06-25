@@ -1,13 +1,14 @@
+/*global test*/
 'use strict'
 
 var request = require('superagent')
 var app = require('../')
 
-test.beforeEach(async(t) => {
+test.beforeEach(async (t) => {
   t.context.agent = request.agent(app.start())
 })
 
-test.serial('client signup: without companyId', async t => {
+test.serial('client signup: without companyId', async (t) => {
   const data = t.context.user
   let res
 

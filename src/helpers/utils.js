@@ -66,21 +66,21 @@ function dateDir () {
 function createMedia (data) {
   return new Promise((resolve, reject) => {
     var absolutePath = data.path
-    mh.getMimeType(absolutePath).then(type => {
+    mh.getMimeType(absolutePath).then((type) => {
       data.uploadedAt = new Date().toISOString()
       data.updatedAt = new Date().toISOString()
       data.state = settings.defaultState
       data.type = type
       data.file = path.basename(data.path)
       var newMedia = new Media(data)
-      newMedia.save(err => {
+      newMedia.save((err) => {
         if (err) { winston.error(err) } else {
           spacebroClient.emit('media-to-db', newMedia)
           resolve(newMedia)
         }
       })
     })
-    .catch(error => reject(error))
+    .catch((error) => reject(error))
   })
 }
 
@@ -99,7 +99,7 @@ function deleteMedia (id) {
 function checkIntegrity () {
   Media.find().exec((err, medias) => {
     if (err) { return winston.error(err) } else {
-      medias.forEach(media => {
+      medias.forEach((media) => {
         var mediaPath = path.join(settings.folder.data, media.path)
         if (mh.isFile(mediaPath) === false) {
           Media.findByIdAndRemove(media._id, function (err, media) {
