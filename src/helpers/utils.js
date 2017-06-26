@@ -8,24 +8,30 @@ const path = require('path')
 const spacebroClient = require('spacebro-client')
 const fs = require('fs-extra')
 const moment = require('moment')
+let settings = {}
 
-function initSpacebroClient (settings) {
-  spacebroClient.connect(settings.host, settings.port, {
-    clientName: settings.client,
-    channelName: settings.channel,
+var init = function (globalSettings) {
+  settings = globalSettings
+  initSpacebroClient(settings.service.spacebro)
+}
+
+function initSpacebroClient (spacebroSettings) {
+  spacebroClient.connect(spacebroSettings.host, spacebroSettings.port, {
+    clientName: spacebroSettings.client,
+    channelName: spacebroSettings.channel,
     verbose: false
   })
-  
+
   spacebroClient.on('connect', () => {
-    console.log(`spacebro: ${spacebro.client} connected to ${spacebro.host}:${spacebro.port}#${spacebro.channel}`)
+    console.log(`spacebro: ${spacebroSettings.client} connected to ${spacebroSettings.host}:${spacebroSettings.port}#${spacebroSettings.channel}`)
   })
 
   spacebroClient.on('connect', () => {
-    console.log(`spacebro: ${spacebro.client} connected to ${spacebro.host}:${spacebro.port}#${spacebro.channel}`)
+    console.log(`spacebro: ${spacebroSettings.client} connected to ${spacebroSettings.host}:${spacebroSettings.port}#${spacebroSettings.channel}`)
   })
 
   spacebroClient.on('disconnect', () => {
-    console.log(`spacebro: disconnected from ${spacebro.host}:${spacebro.port}`)
+    console.log(`spacebro: disconnected from ${spacebroSettings.host}:${spacebroSettings.port}`)
   })
 
   spacebroClient.on('new-member', (data) => {
@@ -37,7 +43,6 @@ function initSpacebroClient (settings) {
     setMeta(data)
     spacebroClient.emit('media-updated', data.meta)
   })
-
 }
 
 function setMeta (media) {
@@ -120,7 +125,7 @@ function checkIntegrity () {
 }
 
 module.exports = {
-  initSpacebroClient,
+  init,
   spacebroClient,
   dateDir,
   createMedia,
