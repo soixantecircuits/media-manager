@@ -19,7 +19,7 @@ let init = (settings) => {
   const server = settings.server
   const port = server.port
   mediaController.init(settings)
-
+  Utils.initSpacebroClient(settings.service.spacebro)
   mongoose.Promise = global.Promise
   mongoose.connect('mongodb://localhost/media-manager')
 

@@ -4,36 +4,41 @@ const Media = require('../models/media')
 const mh = require('media-helper')
 const winston = require('winston')
 const assignment = require('assignment')
-const settings = require('standard-settings').getSettings()
-const spacebro = require('nconf').get('service:spacebro')
 const path = require('path')
 const spacebroClient = require('spacebro-client')
 const fs = require('fs-extra')
 const moment = require('moment')
 
-spacebroClient.connect(spacebro.host, spacebro.port, {
-  clientName: spacebro.client,
-  channelName: spacebro.channel,
-  verbose: false
-})
+function initSpacebroClient (settings) {
+  spacebroClient.connect(settings.host, settings.port, {
+    clientName: settings.client,
+    channelName: settings.channel,
+    verbose: false
+  })
+  
+  spacebroClient.on('connect', () => {
+    console.log(`spacebro: ${spacebro.client} connected to ${spacebro.host}:${spacebro.port}#${spacebro.channel}`)
+  })
 
-spacebroClient.on('connect', () => {
-  console.log(`spacebro: ${spacebro.client} connected to ${spacebro.host}:${spacebro.port}#${spacebro.channel}`)
-})
+  spacebroClient.on('connect', () => {
+    console.log(`spacebro: ${spacebro.client} connected to ${spacebro.host}:${spacebro.port}#${spacebro.channel}`)
+  })
 
-spacebroClient.on('disconnect', () => {
-  console.log(`spacebro: disconnected from ${spacebro.host}:${spacebro.port}`)
-})
+  spacebroClient.on('disconnect', () => {
+    console.log(`spacebro: disconnected from ${spacebro.host}:${spacebro.port}`)
+  })
 
-spacebroClient.on('new-member', (data) => {
-  console.log(`spacebro: ${data.member} has joined.`)
-})
+  spacebroClient.on('new-member', (data) => {
+    console.log(`spacebro: ${data.member} has joined.`)
+  })
 
-spacebroClient.on('media-update', (data) => {
-  console.log(`spacebro: should update ${data._id}`)
-  setMeta(data)
-  spacebroClient.emit('media-updated', data.meta)
-})
+  spacebroClient.on('media-update', (data) => {
+    console.log(`spacebro: should update ${data._id}`)
+    setMeta(data)
+    spacebroClient.emit('media-updated', data.meta)
+  })
+
+}
 
 function setMeta (media) {
   Media.findById(media._id, (err, mediaDoc) => {
@@ -115,6 +120,7 @@ function checkIntegrity () {
 }
 
 module.exports = {
+  initSpacebroClient,
   spacebroClient,
   dateDir,
   createMedia,
