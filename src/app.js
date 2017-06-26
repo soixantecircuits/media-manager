@@ -18,10 +18,14 @@ let init = (settings) => {
   // Mongoose
   const server = settings.server
   const port = server.port
+  var mongodbURL = 'mongodb://localhost/media-manager'
+  if (settings.service.mongodb && settings.service.mongodb.url) {
+    mongodbURL = settings.service.mongodb.url
+  }
   mediaController.init(settings)
   Utils.init(settings)
   mongoose.Promise = global.Promise
-  mongoose.connect('mongodb://localhost/media-manager')
+  mongoose.connect(mongodbURL)
 
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))

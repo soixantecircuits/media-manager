@@ -16,6 +16,9 @@
       "client" : "media-manager",
       "inputMessage": "new-media",
       "outputMessage": "media-to-db"
-    }
+    },
+		"mongodb": {
+			"url": "mongodb://localhost/media-manager"
+		}
   }
 }
