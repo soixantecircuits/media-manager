@@ -12,6 +12,7 @@ const mediaRouter = require('./routes/media.route.js')
 const bucketRouter = require('./routes/bucket.route.js')
 const paginationRouter = require('./routes/pagination.route.js')
 const mediaController = require('./controllers/media.js')
+const bucketController = require('./controllers/bucket')
 
 let init = (settings) => {
   const app = express()
@@ -22,8 +23,9 @@ let init = (settings) => {
   if (settings.service.mongodb && settings.service.mongodb.url) {
     mongodbURL = settings.service.mongodb.url
   }
+  Utils.init(settings) // Init spacebro before events are added
   mediaController.init(settings)
-  Utils.init(settings)
+  bucketController.init()
   mongoose.Promise = global.Promise
   mongoose.connect(mongodbURL)
 

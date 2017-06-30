@@ -207,7 +207,7 @@ function copyOrDownload (msg) {
     console.log('start copyOrDownload process...')
     msg.file = msg.file || path.basename(msg.path)
     var basename = path.basename(msg.file)
-    var mediaRelativePath = path.join(Utils.dateDir(), basename + path.extname(msg.file))
+    var mediaRelativePath = path.join(Utils.dateDir(), basename)
     var mediaAbsolutePath = path.join(settings.folder.data, mediaRelativePath)
     // Copy the media to the disk
     if (mh.isFile(msg.path)) {
@@ -215,7 +215,7 @@ function copyOrDownload (msg) {
       try {
         fs.copySync(msg.path, mediaAbsolutePath)
         msg.path = mediaAbsolutePath
-        msg.url = controller.baserURL + 'static/' + mediaRelativePath
+        msg.url = controller.baseURL + 'static/' + mediaRelativePath
         winston.info('Done copying file ' + msg.file + ' to ' + mediaRelativePath)
         resolve(msg)
       } catch (err) {
@@ -228,7 +228,7 @@ function copyOrDownload (msg) {
           try {
             fs.writeFileSync(mediaAbsolutePath, data)
             msg.path = mediaAbsolutePath
-            msg.url = controller.baserURL + 'static/' + mediaRelativePath
+            msg.url = controller.baseURL + 'static/' + mediaRelativePath
             winston.info('Done downloading file ' + msg.file + ' to ' + mediaRelativePath)
             resolve(msg)
           } catch (err) {
@@ -241,7 +241,7 @@ function copyOrDownload (msg) {
         let base64Data = msg.url.replace(/^data:image\/png;base64,/, '')
         fs.writeFileSync(mediaAbsolutePath, base64Data, 'base64')
         msg.path = mediaAbsolutePath
-        msg.url = controller.baserURL + 'static/' + mediaRelativePath
+        msg.url = controller.baseURL + 'static/' + mediaRelativePath
         winston.info('Done creating file ' + msg.file + ' to ' + mediaRelativePath)
         resolve(msg)
       } catch (err) {
@@ -264,8 +264,8 @@ function toDataFolder (msg) {
     async.eachOf(msg.details, function (mediaVersion, key, callback) {
       if (typeof mediaVersion === 'object' && (mediaVersion.path || mediaVersion.url)) {
         copyOrDownload(mediaVersion)
-        .then((data) => callback())
-        .catch((err) => callback(err))
+          .then((data) => callback())
+          .catch((err) => callback(err))
       } else {
         callback()
       }
@@ -280,20 +280,20 @@ function toDataFolder (msg) {
   })
 }
 
-// ----- SPACEBRO EVENTS ----- //
-Utils.spacebroClient.on('new-media', function (data) {
-  winston.info('EVENT - "new-media" received')
-  toDataFolder(data)
-    .then((data) => {
-      Utils.createMedia(data)
-        .then((media) => winston.info('ADD -', media._id, '-', media.path))
-        .catch((error) => winston.error(error))
-    }).catch((error) => winston.error(error))
-})
-
 let init = (options) => {
   settings = options
   controller.baseURL = `http://${settings.server.host}:${settings.server.port}/`
+
+  // ----- SPACEBRO EVENTS ----- //
+  Utils.spacebroClient.on('new-media', function (data) {
+    winston.info('EVENT - "new-media" received')
+    toDataFolder(data)
+      .then((data) => {
+        Utils.createMedia(data)
+          .then((media) => winston.info('ADD -', media._id, '-', media.path))
+          .catch((error) => winston.error(error))
+      }).catch((error) => winston.error(error))
+  })
 }
 
 controller = {

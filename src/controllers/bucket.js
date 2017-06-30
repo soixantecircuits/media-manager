@@ -13,45 +13,47 @@ function slugify (text) {
     .replace(/-+$/, '')
 }
 
-Utils.spacebroClient.on('media-updated', function (data) {
-  if (data.newBucketId) {
-    var errorMsg = 'Error while updating bucket ' + data.newBucketId + ':\n'
-    Bucket.findById(data.newBucketId, (err, bucket) => {
-      if (err) { return console.error(errorMsg, err) } else {
-        Media.findById(data.mediaId, (err, media) => {
-          if (err) { return console.error(errorMsg, err) } else {
-            bucket.medias.push(media)
-            bucket.save((err) => {
-              if (err) { return console.error(errorMsg, err) } else {
-                console.log('A media has been added to bucket', data.newBucketId)
-              }
-            })
-          }
-        })
-      }
-    })
-  }
-})
+function init () {
+  Utils.spacebroClient.on('media-updated', function (data) {
+    if (data.newBucketId) {
+      var errorMsg = 'Error while updating bucket ' + data.newBucketId + ':\n'
+      Bucket.findById(data.newBucketId, (err, bucket) => {
+        if (err) { return console.error(errorMsg, err) } else {
+          Media.findById(data.mediaId, (err, media) => {
+            if (err) { return console.error(errorMsg, err) } else {
+              bucket.medias.push(media)
+              bucket.save((err) => {
+                if (err) { return console.error(errorMsg, err) } else {
+                  console.log('A media has been added to bucket', data.newBucketId)
+                }
+              })
+            }
+          })
+        }
+      })
+    }
+  })
 
-Utils.spacebroClient.on('media-deleted', function (data) {
-  if (data.bucketId) {
-    var errorMsg = 'Error while deleting media from bucket ' + data.bucketId + ':\n'
-    Bucket.findById(data.bucketId, (err, bucket) => {
-      if (err) { return console.error(errorMsg, err) } else {
-        bucket.medias.forEach((media, index) => {
-          if (media._id.toString() === data.mediaId) {
-            bucket.medias.splice(index, 1)
-            bucket.save((err) => {
-              if (err) { return console.error(errorMsg, err) } else {
-                console.log('A media has been deleted from bucket', data.bucketId)
-              }
-            })
-          }
-        })
-      }
-    })
-  }
-})
+  Utils.spacebroClient.on('media-deleted', function (data) {
+    if (data.bucketId) {
+      var errorMsg = 'Error while deleting media from bucket ' + data.bucketId + ':\n'
+      Bucket.findById(data.bucketId, (err, bucket) => {
+        if (err) { return console.error(errorMsg, err) } else {
+          bucket.medias.forEach((media, index) => {
+            if (media._id.toString() === data.mediaId) {
+              bucket.medias.splice(index, 1)
+              bucket.save((err) => {
+                if (err) { return console.error(errorMsg, err) } else {
+                  console.log('A media has been deleted from bucket', data.bucketId)
+                }
+              })
+            }
+          })
+        }
+      })
+    }
+  })
+}
 
 function postBucket (req, res) {
   var name = req.body.name
@@ -97,17 +99,17 @@ function getBucketCount (req, res) {
 }
 
 function getFirstBucket (req, res) {
-  Bucket.findOne().sort({createdAt: 1})
-  .exec((err, first) => {
-    if (err) { res.send(err) } else { res.json(first) }
-  })
+  Bucket.findOne().sort({ createdAt: 1 })
+    .exec((err, first) => {
+      if (err) { res.send(err) } else { res.json(first) }
+    })
 }
 
 function getLastBucket (req, res) {
-  Bucket.findOne().sort({createdAt: -1})
-  .exec((err, post) => {
-    if (err) { res.send(err) } else { res.json(post) }
-  })
+  Bucket.findOne().sort({ createdAt: -1 })
+    .exec((err, post) => {
+      if (err) { res.send(err) } else { res.json(post) }
+    })
 }
 
 function getBucket (req, res) {
@@ -118,13 +120,14 @@ function getBucket (req, res) {
 
 function deleteBucket (req, res) {
   var id = req.params.id
-  Bucket.remove({_id: id},
-  (err, bucket) => {
-    if (err) { res.send(err) } else { res.send('Successfully deleted ' + id + ' bucket') }
-  })
+  Bucket.remove({ _id: id },
+    (err, bucket) => {
+      if (err) { res.send(err) } else { res.send('Successfully deleted ' + id + ' bucket') }
+    })
 }
 
 module.exports = {
+  init,
   postBucket,
   getAllBuckets,
   getBucketCount,
