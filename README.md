@@ -61,4 +61,4 @@ Example: `yarn start -- -settings settings/settings.custom.json`
 
 ### 📖 Documentation
 
-[Media](/documentation/MEDIA.md)
+[Media](/src/documentation/MEDIA.md)
