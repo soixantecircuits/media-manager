@@ -9,39 +9,38 @@ const spacebroClient = require('spacebro-client')
 const fs = require('fs-extra')
 const moment = require('moment')
 let settings = {}
+let spacebroSettings = {}
 
 var init = function (globalSettings) {
   settings = globalSettings
-  initSpacebroClient(settings.service.spacebro)
+  spacebroSettings = settings.service.spacebro
+  initSpacebroClient()
 }
 
-function initSpacebroClient (spacebroSettings) {
+function initSpacebroClient () {
   spacebroClient.connect(spacebroSettings.host, spacebroSettings.port, {
-    clientName: spacebroSettings.client,
-    channelName: spacebroSettings.channel,
+    client: spacebroSettings.client,
+    channelName: spacebroSettings.channelName,
     verbose: false
   })
 
   spacebroClient.on('connect', () => {
-    console.log(`spacebro: ${spacebroSettings.client} connected to ${spacebroSettings.host}:${spacebroSettings.port}#${spacebroSettings.channel}`)
-  })
-
-  spacebroClient.on('connect', () => {
-    console.log(`spacebro: ${spacebroSettings.client} connected to ${spacebroSettings.host}:${spacebroSettings.port}#${spacebroSettings.channel}`)
+    console.log(`spacebro: ${spacebroSettings.client.name} connected to ${spacebroSettings.host}:${spacebroSettings.port}#${spacebroSettings.channelName}`)
+    spacebroClient.emit('addConnections', spacebroSettings.connections)
   })
 
   spacebroClient.on('disconnect', () => {
     console.log(`spacebro: disconnected from ${spacebroSettings.host}:${spacebroSettings.port}`)
   })
 
-  spacebroClient.on('new-member', (data) => {
-    console.log(`spacebro: ${data.member} has joined.`)
+  spacebroClient.on('newClient', (data) => {
+    console.log(`spacebro: ${data.name} has joined.`)
   })
 
-  spacebroClient.on('media-update', (data) => {
+  spacebroClient.on(spacebroSettings.client.in.inMediaUpdate.eventName, (data) => {
     console.log(`spacebro: should update ${data._id}`)
     setMeta(data)
-    spacebroClient.emit('media-updated', data.meta)
+    spacebroClient.emit(spacebroSettings.client.out.outMediaUpdate.eventName, data.meta)
   })
 }
 
@@ -85,7 +84,7 @@ function createMedia (data) {
       var newMedia = new Media(data)
       newMedia.save((err) => {
         if (err) { winston.error(err) } else {
-          spacebroClient.emit('media-to-db', newMedia)
+          spacebroClient.emit(spacebroSettings.client.out.outMedia.eventName, newMedia)
           resolve(newMedia)
         }
       })
@@ -98,7 +97,7 @@ function deleteMedia (id) {
   return new Promise((resolve, reject) => {
     Media.findByIdAndRemove(id, function (err, media) {
       if (err) { reject(err) } else if (media) {
-        spacebroClient.emit('media-deleted', {mediaId: id, bucketId: media.bucketId})
+        spacebroClient.emit(spacebroSettings.client.out.outMediaDelete.eventName, {mediaId: id, bucketId: media.bucketId})
         winston.info('DELETE -', id, '-', media.path)
         resolve(media)
       }
@@ -114,7 +113,7 @@ function checkIntegrity () {
         if (mh.isFile(mediaPath) === false) {
           Media.findByIdAndRemove(media._id, function (err, media) {
             if (err) { return console.log(err) } else {
-              spacebroClient.emit('media-deleted', {mediaId: media._id, bucketId: media.bucketId})
+              spacebroClient.emit(spacebroSettings.client.out.outMediaDelete.eventName, {mediaId: media._id, bucketId: media.bucketId})
               winston.info('DELETE -', media._id.toString(), '-', media.path)
             }
           })

@@ -35,13 +35,46 @@ By default, **media-manager** loads `settings/settings.default.json`:
   "states": ["public", "private", "draft"],
   "service": {
     "spacebro": {
-      "host" : "localhost",
-      "port" : 8888,
-      "channel": "media-stream",
-      "client" : "media-manager",
-      "inputMessage": "new-media",
-      "outputMessage": "media-to-db"
-    }
+      "host" : "spacebro.space",
+      "port" : 3333,
+      "channelName": "media-stream",
+      "client" : {
+        "name": "media-manager",
+        "description": "Manage a media folder with API, database and realtime events",
+				"in": {
+					"inMedia": {
+						"eventName": "new-media",
+						"description": "Input media to add do the db",
+						"type": "all"
+					},
+					"inMediaUpdate": {
+						"eventName": "media-update",
+						"description": "Update media in db",
+						"type": "all"
+					}
+				},
+				"out": {
+					"outMedia": {
+						"eventName": "media-to-db",
+						"description": "Media saved in db",
+						"type": "all"
+					},
+					"outMediaUpdate": {
+						"eventName": "media-updated",
+						"description": "Media in db was updated",
+						"type": "all"
+					},
+          "outMediaDelete": {
+            "eventName": "media-deleted",
+            "description": "media in db deleted",
+            "type": "all"
+          }
+        }
+      }
+    },
+		"mongodb": {
+			"url": "mongodb://localhost/media-manager"
+		}
   }
 }
 ```
