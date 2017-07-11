@@ -10,6 +10,7 @@ const Media = require('../models/media')
 let settings = {}
 const Utils = require('../helpers/utils')
 var controller = {}
+const spacebroSettings = require('standard-settings').getSettings().service.spacebro
 
 function notFound (id) {
   let error = 'Media not found'
@@ -155,7 +156,7 @@ function updateMedia (req, res) {
             res.send(err)
           } else {
             winston.info('UPDATE -', media._id.toString())
-            Utils.spacebroClient.emit('media-updated', spacebroData)
+            Utils.spacebroClient.emit(spacebroSettings.client.out.outMediaUpdate.eventName, spacebroData)
           }
         })
       }
@@ -181,7 +182,7 @@ function updateMeta (req, res) {
           res.send(err)
         } else {
           winston.info('UPDATE META -', media._id.toString())
-          Utils.spacebroClient.emit('media-updated', meta)
+          Utils.spacebroClient.emit(spacebroSettings.client.out.outMediaUpdate.eventName, meta)
         }
       })
       res.json(media)
