@@ -1,7 +1,7 @@
 {
   "server": {
       "host" : "localhost",
-      "port" : 8008
+      "port" : 36200
   },
   "folder": {
     "data": "/tmp/media-manager"
