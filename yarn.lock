@@ -3249,9 +3249,9 @@ socketio-wildcard@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/socketio-wildcard/-/socketio-wildcard-2.0.0.tgz#2466e832276b19163563bee772388747f912475b"
 
-spacebro-client@^0.4.1:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/spacebro-client/-/spacebro-client-0.4.1.tgz#f53b57e339d191f36dafe3b3bc498492fd8034fe"
+spacebro-client@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/spacebro-client/-/spacebro-client-0.4.2.tgz#409df691e0b412ad157c2be6b82265cffbb959b3"
   dependencies:
     assignment "^2.2.1"
     babel-runtime "6.23.0"

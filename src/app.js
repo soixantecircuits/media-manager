@@ -13,6 +13,8 @@ const bucketRouter = require('./routes/bucket.route.js')
 const paginationRouter = require('./routes/pagination.route.js')
 const mediaController = require('./controllers/media.js')
 const bucketController = require('./controllers/bucket')
+var packageInfos = require('../package.json')
+const stateServe = require('./helpers/state-serve')
 
 let init = (settings, cb) => {
   const app = express()
@@ -66,8 +68,19 @@ let init = (settings, cb) => {
     app.use('/api/v1/medias', paginationRouter)
     app.use('/api/v1/buckets', bucketRouter)
 
-    app.get('/', function (req, res) {
+    app.get('/index.json', function (req, res) {
       res.json({ service: 'media-manager', status: 'running', settings: settings })
+    })
+    
+    stateServe.init(app, {
+      app: {
+        name: packageInfos.name,
+        version: packageInfos.version,
+        site: {
+          url: packageInfos.repository.url,
+          name: packageInfos.name
+        }
+      }
     })
 
     app.listen(port, function (err) {
