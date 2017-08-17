@@ -26,7 +26,6 @@ function initSpacebroClient () {
 
   spacebroClient.on('connect', () => {
     console.log(`spacebro: ${spacebroSettings.client.name} connected to ${spacebroSettings.host}:${spacebroSettings.port}#${spacebroSettings.channelName}`)
-    spacebroClient.emit('addConnections', spacebroSettings.connections)
   })
 
   spacebroClient.on('disconnect', () => {
@@ -51,17 +50,17 @@ function setMeta (media) {
     } else if (!mediaDoc) {
       winston.warn(`media: ${media._id} not found`)
     } else {
-      Media.update({
-        _id: media._id
-      }, {
-        $set: assignment(mediaDoc.toObject(), media)
-      }, (err, doc) => {
-        if (err) {
-          winston.error(err)
-        } else {
-          winston.log(`media - setMeta succeed for ${doc._id}`)
+      Media.update(
+        { _id: media._id },
+        { $set: assignment(mediaDoc.toObject(), media) },
+        (err, doc) => {
+          if (err) {
+            winston.error(err)
+          } else {
+            winston.log(`media - setMeta succeed for ${doc._id}`)
+          }
         }
-      })
+      )
     }
   })
 }
