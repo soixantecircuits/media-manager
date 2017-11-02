@@ -66,7 +66,7 @@ function setMeta (media) {
 }
 
 function dateDir () {
-  var today = moment().format('YYYY-MMMM-DD')
+  var today = moment().format('YYYY-MM-DD')
   fs.ensureDirSync(path.join(settings.folder.data, today))
   return (today)
 }
