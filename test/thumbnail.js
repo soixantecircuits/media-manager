@@ -1,17 +1,12 @@
 'use strict'
-const spaceBro = require('spacebro-client')
-const config = require('standard-settings').getSettings().service.spacebro
+const { SpacebroClient } = require('spacebro-client')
+const settings = require('standard-settings').getSettings()
 
-spaceBro.connect(config.host, config.port, {
-  clientName: config.client,
-  channelName: config.channel,
-  verbose: false,
-  sendBack: false
-})
-console.log('Connecting to spacebro on ' + config.host + ':' + config.port)
+settings.service.spacebro.client.name += '-test'
+const spacebro = new SpacebroClient()
 
-spaceBro.on(config.outputMessage, function (data) {
-  console.log('video is ready: ' + data.output)
+spacebro.on(settings.service.spacebro.client['out'].outMedia.eventName, function (data) {
+  console.log('video is ready: ' + JSON.stringify(data, null, 2))
 })
 
 const data = {
@@ -23,7 +18,7 @@ const data = {
   }
 }
 
-setTimeout(function () {
-  spaceBro.emit(config.inputMessage, data)
+spacebro.on('connect', () => {
+  spacebro.emit(settings.service.spacebro.client['in'].inMedia.eventName, data)
   console.log('emit ')
-}, 300)
+})
