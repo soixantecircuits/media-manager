@@ -8,6 +8,7 @@
   },
   "defaultState": "public",
   "states": ["public", "private", "draft"],
+  "filterMediaUpdated": "public",
   "service": {
     "spacebro": {
       "host" : "spacebro.space",

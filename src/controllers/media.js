@@ -139,7 +139,8 @@ function updateMedia (req, res) {
     } else if (!media) {
       res.send(notFound(req.params.id))
     } else {
-      var spacebroData = { mediaId: media._id }
+      // var spacebroData = { mediaId: media._id }
+      var spacebroData = media
       if (req.body.state && req.body.state !== media.state) {
         media.state = req.body.state
         spacebroData['newState'] = media.state
@@ -156,7 +157,9 @@ function updateMedia (req, res) {
             res.send(err)
           } else {
             winston.info('UPDATE -', media._id.toString())
-            Utils.spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, spacebroData)
+            if (!settings.filterMediaUpdated || (settings.filterMediaUpdated && spacebroData.state === settings.filterMediaUpdated)) {
+              Utils.spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, spacebroData)
+            }
           }
         })
       }
@@ -182,7 +185,9 @@ function updateMeta (req, res) {
           res.send(err)
         } else {
           winston.info('UPDATE META -', media._id.toString())
-          Utils.spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, meta)
+          if (!settings.filterMediaUpdated || (settings.filterMediaUpdated && media.state === settings.filterMediaUpdated)) {
+            Utils.spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, media)
+          }
         }
       })
       res.json(media)
