@@ -156,7 +156,7 @@ function updateMedia (req, res) {
             res.send(err)
           } else {
             winston.info('UPDATE -', media._id.toString())
-            Utils.spacebroClient.emit(spacebroSettings.client.out.outMediaUpdate.eventName, spacebroData)
+            Utils.spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, spacebroData)
           }
         })
       }
@@ -182,7 +182,7 @@ function updateMeta (req, res) {
           res.send(err)
         } else {
           winston.info('UPDATE META -', media._id.toString())
-          Utils.spacebroClient.emit(spacebroSettings.client.out.outMediaUpdate.eventName, meta)
+          Utils.spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, meta)
         }
       })
       res.json(media)
@@ -286,7 +286,7 @@ let init = (options) => {
   controller.baseURL = `http://${settings.server.host}:${settings.server.port}/`
 
   // ----- SPACEBRO EVENTS ----- //
-  Utils.spacebroClient.on('new-media', function (data) {
+  Utils.spacebroClient.on(settings.service.spacebro.client['in'].mediaCreate.eventName, function (data) {
     winston.info('EVENT - "new-media" received')
     toDataFolder(data)
       .then((data) => {

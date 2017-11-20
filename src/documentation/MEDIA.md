@@ -31,10 +31,10 @@ Example:
   }
 ```
 
-A spacebro event `media-to-db` will be emitted.
+A spacebro event `mediaCreated` will be emitted.
 
 #### spacebro
-**media-manager** awaits for `new-media` events.
+**media-manager** awaits for `mediaCreate` events.
 Example:
 ```json
   {

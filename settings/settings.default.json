@@ -17,30 +17,30 @@
         "name": "media-manager",
         "description": "Manage a media folder with API, database and realtime events",
 				"in": {
-					"inMedia": {
-						"eventName": "new-media",
+					"mediaCreate": {
+						"eventName": "mediaCreate",
 						"description": "Input media to add do the db",
 						"type": "all"
 					},
-					"inMediaUpdate": {
-						"eventName": "media-update",
+					"mediaUpdate": {
+						"eventName": "mediaUpdate",
 						"description": "Update media in db",
 						"type": "all"
 					}
 				},
 				"out": {
-					"outMedia": {
-						"eventName": "media-to-db",
+					"mediaCreated": {
+						"eventName": "mediaCreated",
 						"description": "Media saved in db",
 						"type": "all"
 					},
-					"outMediaUpdate": {
-						"eventName": "media-updated",
+					"mediaUpdated": {
+						"eventName": "mediaUpdated",
 						"description": "Media in db was updated",
 						"type": "all"
 					},
-          "outMediaDelete": {
-            "eventName": "media-deleted",
+          "mediaRemoved": {
+            "eventName": "mediaRemoved",
             "description": "media in db deleted",
             "type": "all"
           }

@@ -36,10 +36,10 @@ function initSpacebroClient () {
     console.log(`spacebro: ${data.name} has joined.`)
   })
 
-  spacebroClient.on(spacebroSettings.client.in.inMediaUpdate.eventName, (data) => {
+  spacebroClient.on(spacebroSettings.client.in.mediaUpdate.eventName, (data) => {
     console.log(`spacebro: should update ${data._id}`)
     setMeta(data)
-    spacebroClient.emit(spacebroSettings.client.out.outMediaUpdate.eventName, data.meta)
+    spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, data.meta)
   })
 }
 
@@ -83,7 +83,7 @@ function createMedia (data) {
       var newMedia = new Media(data)
       newMedia.save((err) => {
         if (err) { winston.error(err) } else {
-          spacebroClient.emit(spacebroSettings.client.out.outMedia.eventName, newMedia)
+          spacebroClient.emit(spacebroSettings.client.out.mediaCreated.eventName, newMedia)
           resolve(newMedia)
         }
       })
@@ -96,7 +96,7 @@ function deleteMedia (id) {
   return new Promise((resolve, reject) => {
     Media.findByIdAndRemove(id, function (err, media) {
       if (err) { reject(err) } else if (media) {
-        spacebroClient.emit(spacebroSettings.client.out.outMediaDelete.eventName, {mediaId: id, bucketId: media.bucketId})
+        spacebroClient.emit(spacebroSettings.client.out.mediaRemoved.eventName, {mediaId: id, bucketId: media.bucketId})
         winston.info('DELETE -', id, '-', media.path)
         resolve(media)
       }
@@ -112,7 +112,7 @@ function checkIntegrity () {
         if (mh.isFile(mediaPath) === false) {
           Media.findByIdAndRemove(media._id, function (err, media) {
             if (err) { return console.log(err) } else {
-              spacebroClient.emit(spacebroSettings.client.out.outMediaDelete.eventName, {mediaId: media._id, bucketId: media.bucketId})
+              spacebroClient.emit(spacebroSettings.client.out.mediaRemoved.eventName, {mediaId: media._id, bucketId: media.bucketId})
               winston.info('DELETE -', media._id.toString(), '-', media.path)
             }
           })
