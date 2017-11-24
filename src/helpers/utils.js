@@ -39,7 +39,7 @@ function initSpacebroClient () {
   spacebroClient.on(spacebroSettings.client.in.mediaUpdate.eventName, (data) => {
     console.log(`spacebro: should update ${data._id}`)
     setMeta(data)
-    spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, data.meta)
+    spacebroClient.emit(spacebroSettings.client.out.mediaUpdated.eventName, data)
   })
 }
 
